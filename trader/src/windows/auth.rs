@@ -1,11 +1,8 @@
-use std::future::Future;
 use std::str::FromStr;
 
-use spacedust::apis::default_api::register;
-use spacedust::models::RegisterRequest;
 use spacedust::models::register_request::Faction;
-use spacedust::apis::default_api::RegisterError;
 
+use crate::Command;
 use crate::app::TradingGUI;
 use crate::app::ControlWindow;
 
@@ -14,7 +11,6 @@ pub struct AuthMenuData {
     temp_token: String,
     temp_faction: Faction,
     visable: bool,
-    register_promise: Option<Box<dyn Future<Output = Result<spacedust::models::Register201Response, spacedust::apis::Error<RegisterError>>>>>,
 }
 
 impl Default for AuthMenuData {
@@ -23,14 +19,21 @@ impl Default for AuthMenuData {
             temp_agent_name: Default::default(),
             temp_token: Default::default(),
             temp_faction: Default::default(),
-            visable: false,
-            register_promise: None
+            visable: false
         }
     }
 }
 
 impl ControlWindow for AuthMenuData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
+        {
+            let response_data = trading_gui.response_data.lock().unwrap();
+            if let Some(v) = &response_data.register_data {
+                self.temp_token = v.data.token.clone();
+            }
+        }
+
+
         egui::Window::new("Auth").show(ctx, |ui| {
             ui.heading("Create Agent");
             egui::TextEdit::singleline(&mut self.temp_agent_name).hint_text("Agency Name").show(ui);
@@ -48,7 +51,11 @@ impl ControlWindow for AuthMenuData {
                 });
 
             if ui.button("Create Agent").clicked() {
-                //self.register_promise = Some(Box::new(register(&trading_gui.api_config, Some(RegisterRequest::new(self.temp_faction, self.temp_agent_name)))));
+                {
+                    let mut msg_queue_lock = trading_gui.msg_queue.lock().expect("FUck me up the bum");
+                    msg_queue_lock.push_front(Command::Register { symbol: self.temp_agent_name.clone(), faction: self.temp_faction  });
+                }
+                //register(&trading_gui.api_config, Some(RegisterRequest::new(self.temp_faction, self.temp_agent_name)));
             }
     
             ui.separator();

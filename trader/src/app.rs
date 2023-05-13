@@ -1,8 +1,8 @@
-use std::sync::{Mutex, Arc};
+use std::{sync::{Mutex, Arc}, collections::VecDeque};
 
-use crate::windows::auth::AuthMenuData;
+use crate::{windows::auth::AuthMenuData, Command, CommandData};
 
-pub async fn gui_main() -> eframe::Result<()> {
+pub fn gui_main(msg_queue: Arc<Mutex<VecDeque<Command>>>, response_data: Arc<Mutex<CommandData>>) -> eframe::Result<()> {
     let options = eframe::NativeOptions {
         initial_window_size: Some(egui::vec2(1280.0, 720.0)),
         ..Default::default()
@@ -11,7 +11,7 @@ pub async fn gui_main() -> eframe::Result<()> {
     eframe::run_native(
         "All-Trader",
         options,
-        Box::new(|_cc| Box::<TradingGUI>::default()),
+        Box::new(|_cc| Box::new(TradingGUI::new(msg_queue, response_data))),
     )?;
     Ok(())
 }
@@ -22,17 +22,20 @@ pub trait ControlWindow {
     fn visability(&mut self) -> &mut bool;
 }
 
-#[derive(Clone)]
 pub struct TradingGUI {
-    pub menus: Arc<Mutex<Vec<Box<dyn ControlWindow>>>>
+    pub menus: Arc<Mutex<Vec<Box<dyn ControlWindow>>>>,
+    pub msg_queue: Arc<Mutex<VecDeque<Command>>>,
+    pub response_data: Arc<Mutex<CommandData>>
 }
 
-impl Default for TradingGUI {
-    fn default() -> Self {
-        Self { 
+impl TradingGUI {
+    fn new(msg_queue: Arc<Mutex<VecDeque<Command>>>, response_data: Arc<Mutex<CommandData>>) -> Self {
+        Self {
             menus: Arc::new(Mutex::new(vec![
                 Box::new(AuthMenuData::default())
-            ]))
+            ])),
+            msg_queue,
+            response_data
         }
     }
 }

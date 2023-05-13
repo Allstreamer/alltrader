@@ -7,16 +7,17 @@ edition = "2021"
 opt-level = 3
 
 [dependencies]
-color-eyre = "0.6.2"
-tracing = "0.1.37"
-tracing-subscriber = "0.3.17"
+color-eyre = "0.6"
+tracing = "0.1"
+tracing-subscriber = "0.3"
 tokio = {version = "1", features = ["full"]}
-dotenv = "0.15.0"
-dotenv_codegen = "0.15.0"
-colored = "2.0.0"
+futures = "0.3"
+dotenv = "0.15"
+dotenv_codegen = "0.15"
+colored = "2.0"
 image = "0.24"
-chrono = "0.4.24"
-spacedust = "1.0.5"
-eframe = {version = "0.21.3", features = ["persistence"]}
-egui = "0.21.0"
+chrono = "0.4"
+spacedust = "1"
+eframe = {version = "0.21", features = ["persistence"]}
+egui = "0.21"
 serde = {version = "1", features = ["derive"]}

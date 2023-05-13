@@ -1,19 +1,64 @@
+use std::{collections::VecDeque, sync::{Mutex, Arc}};
+
+use color_eyre::Result;
+use spacedust::{models::{Register201Response, register_request::Faction, RegisterRequest}, apis::{default_api::register, configuration::Configuration}};
+use tokio::runtime::Runtime;
+
 mod app;
 mod windows;
 mod backend;
 
-#[tokio::main]
-async fn main() -> eframe::Result<()> {
-    color_eyre::install().unwrap();
+#[derive(Debug)]
+pub enum Command {
+    Register {
+        symbol: String,
+        faction: Faction
+    },
+    Quit
+}
+
+#[derive(Debug, Default)]
+pub struct CommandData {
+    register_data: Option<Register201Response>,
+}
+
+fn main() -> Result<()> {
+    color_eyre::install()?;
     tracing_subscriber::fmt::init();
 
-    let (tx, mut rx) = tokio::sync::mpsc::channel(32);
+    let msg_queue: Arc<Mutex<VecDeque<Command>>> = Arc::new(Mutex::new(VecDeque::new()));
+    let response_data: Arc<Mutex<CommandData>> = Arc::default();
 
+    let msg_queue_clone = Arc::clone(&msg_queue);
+    let response_data_clone = Arc::clone(&response_data);
 
-    tokio::select! {
-        _ = app::gui_main(tx) => {},
-        _ = backend::backend_main(rx) => {},
-    }
+    let _ = std::thread::spawn(move || {
+        let msg_queue = msg_queue_clone;
+        let response_data = response_data_clone;
+        let config = Configuration::new();
+        let rt  = Runtime::new().unwrap();
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(100)); // Allow time for gui to lock
+            let mut msg_queue_lock = msg_queue.lock().expect("FUGGG noooooo");
+            if msg_queue_lock.is_empty() {
+                drop(msg_queue_lock);
+                continue;
+            }
+            // Check above garanties element
+            let latest_cmd = msg_queue_lock.pop_back().unwrap();
+            match latest_cmd {
+                Command::Quit => break,
+                Command::Register { symbol, faction } => {
+                    let mut response_data_lock = response_data.lock().expect("OH SHIT, it's going down");
+                    rt.block_on(async {
+                        response_data_lock.register_data = register(&config, Some(RegisterRequest::new(faction, symbol))).await.ok();
+                    })
+                }
+            }
+        }
+    });
+
+    app::gui_main(msg_queue, response_data).unwrap();
     Ok(())
 }
 
