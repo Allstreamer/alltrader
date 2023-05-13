@@ -37,19 +37,17 @@ pub fn run_backend(
             }
             // Check above garanties element
             let latest_cmd = msg_queue_lock.pop_back().unwrap();
+            let mut response_data_lock = response_data.lock().expect("OH SHIT, it's going down");
             match latest_cmd {
                 Command::Quit => break,
-                Command::Register { symbol, faction } => {
-                    let mut response_data_lock =
-                        response_data.lock().expect("OH SHIT, it's going down");
-                    rt.block_on(async {
-                        response_data_lock.register_data =
-                            register(&config, Some(RegisterRequest::new(faction, symbol)))
-                                .await
-                                .ok();
-                    })
-                }
+                Command::Register { symbol, faction } => rt.block_on(async {
+                    response_data_lock.register_data =
+                        register(&config, Some(RegisterRequest::new(faction, symbol)))
+                            .await
+                            .ok();
+                }),
             }
+            drop(response_data_lock);
         }
     });
 
