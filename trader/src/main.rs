@@ -1,25 +1,19 @@
-use dotenv_codegen::dotenv;
-use tracing::{warn};
-
 mod app;
 mod windows;
-use app::TradingGUI;
+mod backend;
 
 #[tokio::main]
 async fn main() -> eframe::Result<()> {
     color_eyre::install().unwrap();
     tracing_subscriber::fmt::init();
 
-    let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(1280.0, 720.0)),
-        ..Default::default()
-    };
+    let (tx, mut rx) = tokio::sync::mpsc::channel(32);
 
-    eframe::run_native(
-        "All-Trader",
-        options,
-        Box::new(|_cc| Box::<TradingGUI>::default()),
-    )?;
+
+    tokio::select! {
+        _ = app::gui_main(tx) => {},
+        _ = backend::backend_main(rx) => {},
+    }
     Ok(())
 }
 

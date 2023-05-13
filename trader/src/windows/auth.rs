@@ -1,16 +1,32 @@
+use std::future::Future;
 use std::str::FromStr;
 
+use spacedust::apis::default_api::register;
+use spacedust::models::RegisterRequest;
 use spacedust::models::register_request::Faction;
+use spacedust::apis::default_api::RegisterError;
 
 use crate::app::TradingGUI;
 use crate::app::ControlWindow;
 
-#[derive(Default)]
 pub struct AuthMenuData {
     temp_agent_name: String,
     temp_token: String,
     temp_faction: Faction,
     visable: bool,
+    register_promise: Option<Box<dyn Future<Output = Result<spacedust::models::Register201Response, spacedust::apis::Error<RegisterError>>>>>,
+}
+
+impl Default for AuthMenuData {
+    fn default() -> Self {
+        Self { 
+            temp_agent_name: Default::default(),
+            temp_token: Default::default(),
+            temp_faction: Default::default(),
+            visable: false,
+            register_promise: None
+        }
+    }
 }
 
 impl ControlWindow for AuthMenuData {
@@ -32,14 +48,14 @@ impl ControlWindow for AuthMenuData {
                 });
 
             if ui.button("Create Agent").clicked() {
-                
+                //self.register_promise = Some(Box::new(register(&trading_gui.api_config, Some(RegisterRequest::new(self.temp_faction, self.temp_agent_name)))));
             }
     
             ui.separator();
-            ui.heading("Login");
+            ui.heading("Set Token");
             ui.text_edit_singleline(&mut self.temp_token);
             if ui.button("Set").clicked() {
-                trading_gui.api_config.bearer_access_token = Some(self.temp_token.to_owned());
+                //trading_gui.api_config.bearer_access_token = Some(self.temp_token.to_owned());
             }
         });
     }

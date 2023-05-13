@@ -2,6 +2,19 @@ use std::sync::{Mutex, Arc};
 
 use crate::windows::auth::AuthMenuData;
 
+pub async fn gui_main() -> eframe::Result<()> {
+    let options = eframe::NativeOptions {
+        initial_window_size: Some(egui::vec2(1280.0, 720.0)),
+        ..Default::default()
+    };
+
+    eframe::run_native(
+        "All-Trader",
+        options,
+        Box::new(|_cc| Box::<TradingGUI>::default()),
+    )?;
+    Ok(())
+}
 
 pub trait ControlWindow {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context);
@@ -11,15 +24,12 @@ pub trait ControlWindow {
 
 #[derive(Clone)]
 pub struct TradingGUI {
-    pub api_config: spacedust::apis::configuration::Configuration,
     pub menus: Arc<Mutex<Vec<Box<dyn ControlWindow>>>>
 }
 
 impl Default for TradingGUI {
     fn default() -> Self {
-        // config.bearer_access_token = Some(dotenv!("TOKEN").into());
         Self { 
-            api_config: spacedust::apis::configuration::Configuration::new(),
             menus: Arc::new(Mutex::new(vec![
                 Box::new(AuthMenuData::default())
             ]))
@@ -69,8 +79,4 @@ impl eframe::App for TradingGUI {
             }
         }
     }
-}
-
-impl TradingGUI {
-
 }
