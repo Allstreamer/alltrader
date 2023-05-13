@@ -2,26 +2,16 @@ use std::str::FromStr;
 
 use spacedust::models::register_request::Faction;
 
-use crate::backend::Command;
-use crate::app::TradingGUI;
 use crate::app::ControlWindow;
+use crate::app::TradingGUI;
+use crate::backend::Command;
 
+#[derive(Debug, Default)]
 pub struct AuthMenuData {
     temp_agent_name: String,
     temp_token: String,
     temp_faction: Faction,
     visable: bool,
-}
-
-impl Default for AuthMenuData {
-    fn default() -> Self {
-        Self { 
-            temp_agent_name: Default::default(),
-            temp_token: Default::default(),
-            temp_faction: Default::default(),
-            visable: false
-        }
-    }
 }
 
 impl ControlWindow for AuthMenuData {
@@ -33,10 +23,11 @@ impl ControlWindow for AuthMenuData {
             }
         }
 
-
         egui::Window::new("Auth").show(ctx, |ui| {
             ui.heading("Create Agent");
-            egui::TextEdit::singleline(&mut self.temp_agent_name).hint_text("Agency Name").show(ui);
+            egui::TextEdit::singleline(&mut self.temp_agent_name)
+                .hint_text("Agency Name")
+                .show(ui);
 
             egui::ComboBox::from_label("Select Faction")
                 .selected_text(format!("{:?}", self.temp_faction))
@@ -52,12 +43,16 @@ impl ControlWindow for AuthMenuData {
 
             if ui.button("Create Agent").clicked() {
                 {
-                    let mut msg_queue_lock = trading_gui.msg_queue.lock().expect("FUck me up the bum");
-                    msg_queue_lock.push_front(Command::Register { symbol: self.temp_agent_name.clone(), faction: self.temp_faction  });
+                    let mut msg_queue_lock =
+                        trading_gui.msg_queue.lock().expect("FUck me up the bum");
+                    msg_queue_lock.push_front(Command::Register {
+                        symbol: self.temp_agent_name.clone(),
+                        faction: self.temp_faction,
+                    });
                 }
                 //register(&trading_gui.api_config, Some(RegisterRequest::new(self.temp_faction, self.temp_agent_name)));
             }
-    
+
             ui.separator();
             ui.heading("Set Token");
             ui.text_edit_singleline(&mut self.temp_token);

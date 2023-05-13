@@ -1,8 +1,17 @@
-use std::{sync::{Mutex, Arc}, collections::VecDeque};
+use std::{
+    collections::VecDeque,
+    sync::{Arc, Mutex},
+};
 
-use crate::{windows::auth::AuthMenuData, backend::{Command, CommandData}};
+use crate::{
+    backend::{Command, CommandData},
+    windows::auth::AuthMenuData,
+};
 
-pub fn gui_main(msg_queue: Arc<Mutex<VecDeque<Command>>>, response_data: Arc<Mutex<CommandData>>) -> eframe::Result<()> {
+pub fn gui_main(
+    msg_queue: Arc<Mutex<VecDeque<Command>>>,
+    response_data: Arc<Mutex<CommandData>>,
+) -> eframe::Result<()> {
     let options = eframe::NativeOptions {
         initial_window_size: Some(egui::vec2(1280.0, 720.0)),
         ..Default::default()
@@ -25,17 +34,18 @@ pub trait ControlWindow {
 pub struct TradingGUI {
     pub menus: Arc<Mutex<Vec<Box<dyn ControlWindow>>>>,
     pub msg_queue: Arc<Mutex<VecDeque<Command>>>,
-    pub response_data: Arc<Mutex<CommandData>>
+    pub response_data: Arc<Mutex<CommandData>>,
 }
 
 impl TradingGUI {
-    fn new(msg_queue: Arc<Mutex<VecDeque<Command>>>, response_data: Arc<Mutex<CommandData>>) -> Self {
+    fn new(
+        msg_queue: Arc<Mutex<VecDeque<Command>>>,
+        response_data: Arc<Mutex<CommandData>>,
+    ) -> Self {
         Self {
-            menus: Arc::new(Mutex::new(vec![
-                Box::new(AuthMenuData::default())
-            ])),
+            menus: Arc::new(Mutex::new(vec![Box::<AuthMenuData>::default()])),
             msg_queue,
-            response_data
+            response_data,
         }
     }
 }
@@ -58,14 +68,17 @@ impl eframe::App for TradingGUI {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Menus");
 
-            ui.with_layout(egui::Layout::top_down(egui::Align::LEFT).with_cross_justify(true), |ui| {
+            ui.with_layout(
+                egui::Layout::top_down(egui::Align::LEFT).with_cross_justify(true),
+                |ui| {
                     let menus = Arc::clone(&self.menus);
                     let mut menus_lock = menus.lock().unwrap();
                     for menu in menus_lock.iter_mut() {
                         let menu_name = menu.name().to_owned();
                         ui.toggle_value(menu.visability(), menu_name);
                     }
-            });
+                },
+            );
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 ui.horizontal(|ui| {
