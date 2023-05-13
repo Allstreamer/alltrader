@@ -1,6 +1,6 @@
 use std::{sync::{Mutex, Arc}, collections::VecDeque};
 
-use crate::{windows::auth::AuthMenuData, Command, CommandData};
+use crate::{windows::auth::AuthMenuData, backend::{Command, CommandData}};
 
 pub fn gui_main(msg_queue: Arc<Mutex<VecDeque<Command>>>, response_data: Arc<Mutex<CommandData>>) -> eframe::Result<()> {
     let options = eframe::NativeOptions {
@@ -48,6 +48,8 @@ impl eframe::App for TradingGUI {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
                         _frame.close();
+                        let mut msg_queue_lock = self.msg_queue.lock().expect("Shit");
+                        msg_queue_lock.push_front(Command::Quit);
                     }
                 });
             });

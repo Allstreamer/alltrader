@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use spacedust::models::register_request::Faction;
 
-use crate::Command;
+use crate::backend::Command;
 use crate::app::TradingGUI;
 use crate::app::ControlWindow;
 
