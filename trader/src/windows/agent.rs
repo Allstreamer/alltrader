@@ -1,6 +1,7 @@
 use crate::{
     app::{ControlWindow, TradingGUI},
     backend::{push_command, Command, CommandRequest},
+    utils::ExpectLock,
 };
 
 #[derive(Debug, Default)]
@@ -43,7 +44,7 @@ impl ControlWindow for AgentData {
                     }
                 });
                 {
-                    let response_data = trading_gui.response_data.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
+                    let response_data = ExpectLock!(trading_gui.response_data.lock());
                     if let Some(v) = &response_data.agent_data {
                         if v.1 == self.name() {
                             trading_gui.game_data.agent_data = Some(*v.0.data.clone());

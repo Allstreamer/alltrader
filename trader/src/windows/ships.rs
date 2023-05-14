@@ -1,4 +1,4 @@
-use crate::{app::{ControlWindow, TradingGUI}, backend::{push_command, CommandRequest, Command}};
+use crate::{app::{ControlWindow, TradingGUI}, backend::{push_command, CommandRequest, Command}, utils::ExpectLock};
 
 #[derive(Debug, Default)]
 pub struct ShipMenuData {
@@ -26,7 +26,7 @@ impl ControlWindow for ShipMenuData {
         });
 
         {
-            let mut response_data = trading_gui.response_data.lock().unwrap();
+            let mut response_data = ExpectLock!(trading_gui.response_data.lock());
             if let Some(v) = &response_data.ships_data {
                 if v.1 == self.name() {
                     trading_gui.game_data.ship_data = Some(v.0.data.to_owned());

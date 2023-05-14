@@ -8,6 +8,7 @@ mod app;
 mod backend;
 mod gamedata;
 mod windows;
+mod utils;
 
 fn main() -> Result<()> {
     color_eyre::install()?;

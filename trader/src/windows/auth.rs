@@ -5,6 +5,7 @@ use crate::app::TradingGUI;
 use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
+use crate::utils::ExpectLock;
 
 #[derive(Debug, Default)]
 pub struct AuthMenuData {
@@ -68,7 +69,7 @@ impl ControlWindow for AuthMenuData {
         });
 
         {
-            let mut response_data = trading_gui.response_data.lock().unwrap();
+            let mut response_data = ExpectLock!(trading_gui.response_data.lock());
             if let Some(v) = &response_data.agent_data {
                 if v.1 == self.name() {
                     trading_gui.game_data.agent_data = Some(*v.0.data.clone());

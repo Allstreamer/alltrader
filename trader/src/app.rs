@@ -6,7 +6,7 @@ use std::{
 use crate::{
     backend::{push_command, Command, CommandData, CommandRequest},
     gamedata::GameData,
-    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData},
+    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData}, utils::ExpectLock,
 };
 
 pub fn gui_main(
@@ -79,7 +79,7 @@ impl eframe::App for TradingGUI {
                 egui::Layout::top_down(egui::Align::LEFT).with_cross_justify(true),
                 |ui| {
                     let menus = Arc::clone(&self.menus);
-                    let mut menus_lock = menus.lock().unwrap();
+                    let mut menus_lock = ExpectLock!(menus.lock());
                     for menu in menus_lock.iter_mut() {
                         let menu_name = menu.name().to_owned();
                         ui.toggle_value(menu.visibility(), menu_name);
@@ -96,7 +96,7 @@ impl eframe::App for TradingGUI {
 
         {
             let menus = Arc::clone(&self.menus);
-            let mut menus_lock = menus.lock().unwrap();
+            let mut menus_lock = ExpectLock!(menus.lock());
             for i in 0..menus_lock.len() {
                 if *menus_lock[i].visibility() {
                     menus_lock[i].draw(self, ctx);

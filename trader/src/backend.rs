@@ -12,6 +12,8 @@ use spacedust::{
 };
 use tokio::runtime::Runtime;
 
+use crate::utils::{UnwrapReq, ExpectLock};
+
 // Just for clarity when reading
 type ResponseID = String;
 #[derive(Debug)]
@@ -27,7 +29,7 @@ pub enum Command {
 }
 
 pub fn push_command(msg_queue: &Arc<Mutex<VecDeque<CommandRequest>>>, cmd: CommandRequest) {
-    let mut msg_queue_lock = msg_queue.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
+    let mut msg_queue_lock = ExpectLock!(msg_queue.lock());
     msg_queue_lock.push_front(cmd);
 }
 
@@ -36,18 +38,6 @@ pub struct CommandData {
     pub agent_data: Option<(GetMyAgent200Response, ResponseID)>,
     pub register_data: Option<(Register201Response, ResponseID)>,
     pub ships_data: Option<(GetMyShips200Response, ResponseID)>,
-}
-
-macro_rules! UnwrapReq {
-    ($req:expr, $id:expr) => {
-        match $req {
-            Ok(v) => Some((v, $id)),
-            Err(e) => {
-                dbg!(e);
-                None
-            }
-        }
-    };
 }
 
 pub fn run_backend(
@@ -59,7 +49,7 @@ pub fn run_backend(
         let rt = Runtime::new().unwrap();
         loop {
             std::thread::sleep(std::time::Duration::from_millis(100)); // Allow time for gui to lock
-            let mut msg_queue_lock = msg_queue.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
+            let mut msg_queue_lock = ExpectLock!(msg_queue.lock());
             if msg_queue_lock.is_empty() {
                 drop(msg_queue_lock);
                 continue;
@@ -67,7 +57,7 @@ pub fn run_backend(
             // Check above garanties element
             let latest_cmd = msg_queue_lock.pop_back().unwrap();
             dbg!(&latest_cmd.0, &msg_queue_lock);
-            let mut response_data_lock = response_data.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
+            let mut response_data_lock = ExpectLock!(response_data.lock());
             match latest_cmd.0 {
                 Command::Quit => break,
                 Command::SetToken { token } => {
