@@ -1,29 +1,22 @@
-use std::str::FromStr;
-
 use spacedust::models::register_request::Faction;
 
 use crate::app::ControlWindow;
 use crate::app::TradingGUI;
+use crate::backend::push_command;
 use crate::backend::Command;
+use crate::backend::CommandRequest;
 
 #[derive(Debug, Default)]
 pub struct AuthMenuData {
     temp_agent_name: String,
     temp_token: String,
     temp_faction: Faction,
-    visable: bool,
+    visible: bool,
 }
 
 impl ControlWindow for AuthMenuData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
-        {
-            let response_data = trading_gui.response_data.lock().unwrap();
-            if let Some(v) = &response_data.register_data {
-                self.temp_token = v.data.token.clone();
-            }
-        }
-
-        egui::Window::new("Auth").show(ctx, |ui| {
+        egui::Window::new(self.name()).show(ctx, |ui| {
             ui.heading("Create Agent");
             egui::TextEdit::singleline(&mut self.temp_agent_name)
                 .hint_text("Agency Name")
@@ -42,31 +35,74 @@ impl ControlWindow for AuthMenuData {
                 });
 
             if ui.button("Create Agent").clicked() {
-                {
-                    let mut msg_queue_lock =
-                        trading_gui.msg_queue.lock().expect("FUck me up the bum");
-                    msg_queue_lock.push_front(Command::Register {
-                        symbol: self.temp_agent_name.clone(),
-                        faction: self.temp_faction,
-                    });
-                }
-                //register(&trading_gui.api_config, Some(RegisterRequest::new(self.temp_faction, self.temp_agent_name)));
+                push_command(
+                    &trading_gui.msg_queue,
+                    CommandRequest(
+                        Command::Register {
+                            symbol: self.temp_agent_name.clone(),
+                            faction: self.temp_faction,
+                        },
+                        self.name(),
+                    ),
+                );
             }
 
             ui.separator();
             ui.heading("Set Token");
             ui.text_edit_singleline(&mut self.temp_token);
             if ui.button("Set").clicked() {
-                //trading_gui.api_config.bearer_access_token = Some(self.temp_token.to_owned());
+                push_command(
+                    &trading_gui.msg_queue,
+                    CommandRequest(
+                        Command::SetToken {
+                            token: self.temp_token.clone(),
+                        },
+                        self.name(),
+                    ),
+                );
+                push_command(
+                    &trading_gui.msg_queue,
+                    CommandRequest(Command::GetMyAgent, self.name()),
+                );
+            }
+
+            {
+                let mut response_data = trading_gui.response_data.lock().unwrap();
+                if let Some(v) = &response_data.agent_data {
+                    if v.1 == self.name() {
+                        trading_gui.game_data.agent_data = Some(*v.0.data.clone());
+                        response_data.agent_data = None;
+                    }
+                }
+
+                if let Some(v) = &response_data.register_data {
+                    if v.1 == self.name() {
+                        self.temp_token = v.0.data.token.clone();
+                        push_command(
+                            &trading_gui.msg_queue,
+                            CommandRequest(
+                                Command::SetToken {
+                                    token: v.0.data.token.clone(),
+                                },
+                                self.name(),
+                            ),
+                        );
+                        push_command(
+                            &trading_gui.msg_queue,
+                            CommandRequest(Command::GetMyAgent, self.name()),
+                        );
+                        response_data.register_data = None;
+                    }
+                }
             }
         });
     }
 
     fn name(&self) -> String {
-        String::from_str("Auth").unwrap()
+        String::from("Auth")
     }
 
-    fn visability(&mut self) -> &mut bool {
-        &mut self.visable
+    fn visibility(&mut self) -> &mut bool {
+        &mut self.visible
     }
 }

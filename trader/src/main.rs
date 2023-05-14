@@ -6,6 +6,7 @@ use std::{
 
 mod app;
 mod backend;
+mod gamedata;
 mod windows;
 
 fn main() -> Result<()> {

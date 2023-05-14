@@ -4,12 +4,13 @@ use std::{
 };
 
 use crate::{
-    backend::{Command, CommandData},
-    windows::auth::AuthMenuData,
+    backend::{push_command, Command, CommandData, CommandRequest},
+    gamedata::GameData,
+    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData},
 };
 
 pub fn gui_main(
-    msg_queue: Arc<Mutex<VecDeque<Command>>>,
+    msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     response_data: Arc<Mutex<CommandData>>,
 ) -> eframe::Result<()> {
     let options = eframe::NativeOptions {
@@ -28,24 +29,30 @@ pub fn gui_main(
 pub trait ControlWindow {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context);
     fn name(&self) -> String;
-    fn visability(&mut self) -> &mut bool;
+    fn visibility(&mut self) -> &mut bool;
 }
 
 pub struct TradingGUI {
     pub menus: Arc<Mutex<Vec<Box<dyn ControlWindow>>>>,
-    pub msg_queue: Arc<Mutex<VecDeque<Command>>>,
+    pub msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     pub response_data: Arc<Mutex<CommandData>>,
+    pub game_data: GameData,
 }
 
 impl TradingGUI {
     fn new(
-        msg_queue: Arc<Mutex<VecDeque<Command>>>,
+        msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
         response_data: Arc<Mutex<CommandData>>,
     ) -> Self {
         Self {
-            menus: Arc::new(Mutex::new(vec![Box::<AuthMenuData>::default()])),
+            menus: Arc::new(Mutex::new(vec![
+                Box::<AuthMenuData>::default(),
+                Box::<ShipMenuData>::default(),
+                Box::<AgentData>::default(),
+            ])),
             msg_queue,
             response_data,
+            game_data: Default::default(),
         }
     }
 }
@@ -58,8 +65,8 @@ impl eframe::App for TradingGUI {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
                         _frame.close();
-                        let mut msg_queue_lock = self.msg_queue.lock().expect("Shit");
-                        msg_queue_lock.push_front(Command::Quit);
+                        // ID may be empty below since we aren't expecting/processing a response
+                        push_command(&self.msg_queue, CommandRequest(Command::Quit, "".into()));
                     }
                 });
             });
@@ -75,7 +82,7 @@ impl eframe::App for TradingGUI {
                     let mut menus_lock = menus.lock().unwrap();
                     for menu in menus_lock.iter_mut() {
                         let menu_name = menu.name().to_owned();
-                        ui.toggle_value(menu.visability(), menu_name);
+                        ui.toggle_value(menu.visibility(), menu_name);
                     }
                 },
             );
@@ -91,7 +98,7 @@ impl eframe::App for TradingGUI {
             let menus = Arc::clone(&self.menus);
             let mut menus_lock = menus.lock().unwrap();
             for i in 0..menus_lock.len() {
-                if *menus_lock[i].visability() {
+                if *menus_lock[i].visibility() {
                     menus_lock[i].draw(self, ctx);
                 }
             }
