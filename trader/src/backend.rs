@@ -27,7 +27,7 @@ pub enum Command {
 }
 
 pub fn push_command(msg_queue: &Arc<Mutex<VecDeque<CommandRequest>>>, cmd: CommandRequest) {
-    let mut msg_queue_lock = msg_queue.lock().expect("FUck me up the bum");
+    let mut msg_queue_lock = msg_queue.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
     msg_queue_lock.push_front(cmd);
 }
 
@@ -59,7 +59,7 @@ pub fn run_backend(
         let rt = Runtime::new().unwrap();
         loop {
             std::thread::sleep(std::time::Duration::from_millis(100)); // Allow time for gui to lock
-            let mut msg_queue_lock = msg_queue.lock().expect("FUGGG noooooo");
+            let mut msg_queue_lock = msg_queue.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
             if msg_queue_lock.is_empty() {
                 drop(msg_queue_lock);
                 continue;
@@ -67,7 +67,7 @@ pub fn run_backend(
             // Check above garanties element
             let latest_cmd = msg_queue_lock.pop_back().unwrap();
             dbg!(&latest_cmd.0, &msg_queue_lock);
-            let mut response_data_lock = response_data.lock().expect("OH SHIT, it's going down");
+            let mut response_data_lock = response_data.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
             match latest_cmd.0 {
                 Command::Quit => break,
                 Command::SetToken { token } => {

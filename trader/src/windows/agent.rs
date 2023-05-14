@@ -43,7 +43,7 @@ impl ControlWindow for AgentData {
                     }
                 });
                 {
-                    let response_data = trading_gui.response_data.lock().expect("AWSHIT");
+                    let response_data = trading_gui.response_data.lock().expect("Tried to aquire lock on Mutex that was owned by panicked thread!");
                     if let Some(v) = &response_data.agent_data {
                         if v.1 == self.name() {
                             trading_gui.game_data.agent_data = Some(*v.0.data.clone());
