@@ -5,9 +5,9 @@ use std::{
 
 use color_eyre::Result;
 use spacedust::{
-    apis::{agents_api::get_my_agent, configuration::Configuration, default_api::register},
+    apis::{agents_api::get_my_agent, configuration::Configuration, default_api::register, fleet_api::get_my_ships},
     models::{
-        register_request::Faction, GetMyAgent200Response, Register201Response, RegisterRequest,
+        register_request::Faction, GetMyAgent200Response, Register201Response, RegisterRequest, GetMyShips200Response,
     },
 };
 use tokio::runtime::Runtime;
@@ -21,6 +21,7 @@ pub struct CommandRequest(pub Command, pub ResponseID);
 pub enum Command {
     Register { symbol: String, faction: Faction },
     SetToken { token: String },
+    GetMyShips,
     GetMyAgent,
     Quit,
 }
@@ -34,6 +35,7 @@ pub fn push_command(msg_queue: &Arc<Mutex<VecDeque<CommandRequest>>>, cmd: Comma
 pub struct CommandData {
     pub agent_data: Option<(GetMyAgent200Response, ResponseID)>,
     pub register_data: Option<(Register201Response, ResponseID)>,
+    pub ships_data: Option<(GetMyShips200Response, ResponseID)>,
 }
 
 macro_rules! UnwrapReq {
@@ -71,12 +73,18 @@ pub fn run_backend(
                 Command::SetToken { token } => {
                     println!("Why am i getting called");
                     config.bearer_access_token = Some(token);
-                }
+                },
                 Command::GetMyAgent => {
                     rt.block_on(async {
                         response_data_lock.agent_data =
                             UnwrapReq!(get_my_agent(&config).await, latest_cmd.1);
                     });
+                },
+                Command::GetMyShips => {
+                    rt.block_on(async {
+                        // TODO: Create Function to get all ships even if list is longer than 20 ships
+                        response_data_lock.ships_data = UnwrapReq!(get_my_ships(&config, Some(1), Some(20)).await, latest_cmd.1);
+                    })
                 }
                 Command::Register { symbol, faction } => rt.block_on(async {
                     response_data_lock.register_data = UnwrapReq!(

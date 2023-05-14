@@ -47,8 +47,8 @@ impl TradingGUI {
         Self {
             menus: Arc::new(Mutex::new(vec![
                 Box::<AuthMenuData>::default(),
-                Box::<ShipMenuData>::default(),
                 Box::<AgentData>::default(),
+                Box::<ShipMenuData>::default(),
             ])),
             msg_queue,
             response_data,

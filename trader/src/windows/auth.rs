@@ -65,37 +65,39 @@ impl ControlWindow for AuthMenuData {
                     CommandRequest(Command::GetMyAgent, self.name()),
                 );
             }
+        });
 
-            {
-                let mut response_data = trading_gui.response_data.lock().unwrap();
-                if let Some(v) = &response_data.agent_data {
-                    if v.1 == self.name() {
-                        trading_gui.game_data.agent_data = Some(*v.0.data.clone());
-                        response_data.agent_data = None;
-                    }
-                }
-
-                if let Some(v) = &response_data.register_data {
-                    if v.1 == self.name() {
-                        self.temp_token = v.0.data.token.clone();
-                        push_command(
-                            &trading_gui.msg_queue,
-                            CommandRequest(
-                                Command::SetToken {
-                                    token: v.0.data.token.clone(),
-                                },
-                                self.name(),
-                            ),
-                        );
-                        push_command(
-                            &trading_gui.msg_queue,
-                            CommandRequest(Command::GetMyAgent, self.name()),
-                        );
-                        response_data.register_data = None;
-                    }
+        {
+            let mut response_data = trading_gui.response_data.lock().unwrap();
+            if let Some(v) = &response_data.agent_data {
+                if v.1 == self.name() {
+                    trading_gui.game_data.agent_data = Some(*v.0.data.clone());
+                    response_data.agent_data = None;
                 }
             }
-        });
+
+            if let Some(v) = &response_data.register_data {
+                if v.1 == self.name() {
+                    self.temp_token = v.0.data.token.clone();
+                    trading_gui.game_data.ship_data = Some(vec![*v.0.data.ship.clone()]);
+
+                    push_command(
+                        &trading_gui.msg_queue,
+                        CommandRequest(
+                            Command::SetToken {
+                                token: v.0.data.token.clone(),
+                            },
+                            self.name(),
+                        ),
+                    );
+                    push_command(
+                        &trading_gui.msg_queue,
+                        CommandRequest(Command::GetMyAgent, self.name()),
+                    );
+                    response_data.register_data = None;
+                }
+            }
+        }
     }
 
     fn name(&self) -> String {
