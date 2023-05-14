@@ -3,7 +3,6 @@ A GUI for the V2 [Space-Traders](spacetraders.io) API game
 
 ## Run
 ```bash
-# Download repo
 git clone https://github.com/Allstreamer/alltrader
 cd alltrader
 cargo run
