@@ -8,7 +8,6 @@ pub struct ShipMenuData {
 impl ControlWindow for ShipMenuData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
         egui::Window::new(self.name()).show(ctx, |ui| {
-            ui.heading("Ship List");
             if let Some(ship_list) = &trading_gui.game_data.ship_data {
                 egui::Grid::new("ship_list_grid").num_columns(1).spacing([40.0, 20.0]).striped(true).show(ui, |ui| {
                     for ship in ship_list {

@@ -12,7 +12,6 @@ pub struct AgentData {
 impl ControlWindow for AgentData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
         egui::Window::new(self.name()).show(ctx, |ui| {
-            ui.heading("Your Data");
             if let Some(v) = &trading_gui.game_data.agent_data {
                 egui::Grid::new("user_data_grid")
                     .num_columns(2)

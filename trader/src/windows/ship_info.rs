@@ -9,7 +9,7 @@ pub struct ShipInfoData {
 impl ControlWindow for ShipInfoData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
         egui::Window::new(self.name()).show(ctx, |ui| {
-            ui.heading("Ship Info");
+            
         });
     }
 
