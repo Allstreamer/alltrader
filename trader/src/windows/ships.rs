@@ -2,7 +2,6 @@ use crate::{app::{ControlWindow, TradingGUI}, backend::{push_command, CommandReq
 
 #[derive(Debug, Default)]
 pub struct ShipMenuData {
-    selected_ship_symbol: String,
     visible: bool,
 }
 
@@ -13,7 +12,7 @@ impl ControlWindow for ShipMenuData {
             if let Some(ship_list) = &trading_gui.game_data.ship_data {
                 egui::Grid::new("ship_list_grid").num_columns(1).spacing([40.0, 20.0]).striped(true).show(ui, |ui| {
                     for ship in ship_list {
-                        ui.selectable_value(&mut self.selected_ship_symbol, ship.symbol.clone(), &ship.symbol);
+                        ui.selectable_value(&mut trading_gui.game_data.selected_ship, Some(ship.symbol.clone()), &ship.symbol);
                         ui.end_row();
                     }
                 });

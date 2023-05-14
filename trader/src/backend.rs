@@ -61,7 +61,6 @@ pub fn run_backend(
             match latest_cmd.0 {
                 Command::Quit => break,
                 Command::SetToken { token } => {
-                    println!("Why am i getting called");
                     config.bearer_access_token = Some(token);
                 },
                 Command::GetMyAgent => {
