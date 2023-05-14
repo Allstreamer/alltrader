@@ -34,12 +34,14 @@ impl ControlWindow for AgentData {
                         ui.label(v.credits.to_string());
                         ui.end_row();
                     });
-                if ui.button("Refresh").clicked() {
-                    push_command(
-                        &trading_gui.msg_queue,
-                        CommandRequest(Command::GetMyAgent, self.name()),
-                    );
-                }
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+                    if ui.button("Refresh").clicked() {
+                        push_command(
+                            &trading_gui.msg_queue,
+                            CommandRequest(Command::GetMyAgent, self.name()),
+                        );
+                    }
+                });
                 {
                     let response_data = trading_gui.response_data.lock().expect("AWSHIT");
                     if let Some(v) = &response_data.agent_data {
