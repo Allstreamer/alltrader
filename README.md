@@ -1,5 +1,5 @@
 # All-Trader (WIP)
-A GUI for the V2 [Space-Traders](spacetraders.io) API game
+A GUI for the V2 [Space-Traders](https://spacetraders.io/) API game
 
 ## Run
 ```bash
