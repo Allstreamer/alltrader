@@ -14,7 +14,8 @@ dotenv_codegen = "0.15"
 colored = "2.0"
 image = "0.24"
 chrono = "0.4"
-spacedust = "1"
+spacedust = "1.0.5"
 eframe = {version = "0.21", features = ["persistence"]}
 egui = "0.21"
 serde = {version = "1", features = ["derive"]}
+rust-ini = "0.19.0"

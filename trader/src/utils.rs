@@ -15,5 +15,5 @@ macro_rules! ExpectLock {
         $lock_get.expect("Tried to aquire lock on Mutex that was owned by panicked thread!")
     };
 }
-pub(crate) use UnwrapReq;
 pub(crate) use ExpectLock;
+pub(crate) use UnwrapReq;

@@ -6,9 +6,10 @@ use std::{
 
 mod app;
 mod backend;
+mod config;
 mod gamedata;
-mod windows;
 mod utils;
+mod windows;
 
 fn main() -> Result<()> {
     color_eyre::install()?;

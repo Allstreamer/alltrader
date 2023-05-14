@@ -1,8 +1,9 @@
-use spacedust::models::{Agent, Ship};
+use spacedust::models::{Agent, Contract, Ship};
 
 #[derive(Debug, Clone, Default)]
 pub struct GameData {
     pub agent_data: Option<Agent>,
     pub ship_data: Option<Vec<Ship>>,
-    pub selected_ship: Option<String>,
+    pub selected_ship: Option<Ship>,
+    pub contract_data: Option<Vec<Contract>>,
 }
