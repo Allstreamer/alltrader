@@ -2,19 +2,19 @@ use crate::app::{ControlWindow, TradingGUI};
 
 
 #[derive(Debug, Default)]
-pub struct XData {
+pub struct ShipInfoData {
     visible: bool,
 }
 
-impl ControlWindow for XData {
+impl ControlWindow for ShipInfoData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
         egui::Window::new(self.name()).show(ctx, |ui| {
-            ui.heading("Create Agent");
+            ui.heading("Ship Info");
         });
     }
 
     fn name(&self) -> String {
-        String::from("X")
+        String::from("Ship Info")
     }
 
     fn visibility(&mut self) -> &mut bool {

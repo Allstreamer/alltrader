@@ -6,7 +6,7 @@ use std::{
 use crate::{
     backend::{push_command, Command, CommandData, CommandRequest},
     gamedata::GameData,
-    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData}, utils::ExpectLock,
+    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData, ship_info::ShipInfoData}, utils::ExpectLock,
 };
 
 pub fn gui_main(
@@ -49,6 +49,7 @@ impl TradingGUI {
                 Box::<AuthMenuData>::default(),
                 Box::<AgentData>::default(),
                 Box::<ShipMenuData>::default(),
+                Box::<ShipInfoData>::default(),
             ])),
             msg_queue,
             response_data,
