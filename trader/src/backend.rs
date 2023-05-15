@@ -100,7 +100,6 @@ pub fn run_backend(
                 }
                 Command::GetMyContracts => {
                     rt.block_on(async {
-                        // TODO: Create Function to get all ships even if list is longer than 20 ships
                         response_data_lock.contract_data = UnwrapReq!(
                             get_contracts(&config, Some(1), Some(20)).await,
                             latest_cmd.1

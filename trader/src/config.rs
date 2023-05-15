@@ -1,8 +1,5 @@
 use ini::Ini;
 
-pub enum IniError {
-    FileNotFoundError,
-}
 fn get_config() -> Option<Ini> {
     let result = Ini::load_from_file("./config/config.ini");
     match result {
@@ -23,7 +20,7 @@ pub fn get_config_key(section: &str, key: &str) -> String {
     }
 }
 pub fn set_config_key(section: &str, key: &str, value: &str) {
-    let mut conf = get_config();
+    let conf = get_config();
     if let Some(mut conf) = conf {
         let mut section = conf.with_section(Some(section));
         section.set(key, value);
