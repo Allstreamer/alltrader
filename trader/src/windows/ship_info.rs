@@ -1,6 +1,10 @@
 use std::fmt::Debug;
 
-use crate::app::{ControlWindow, TradingGUI};
+use crate::{
+    app::{ControlWindow, TradingGUI},
+    backend::{push_command, Command, CommandRequest},
+    utils::ExpectLock,
+};
 
 #[derive(Debug, Default)]
 pub struct ShipInfoData {
@@ -176,6 +180,33 @@ impl ControlWindow for ShipInfoData {
                                 "Fuel: {}/{}",
                                 selected_ship.fuel.current, selected_ship.fuel.capacity
                             ));
+                            if ui.button("Refuel").clicked() {
+                                push_command(
+                                    &trading_gui.msg_queue,
+                                    CommandRequest(
+                                        Command::Refuel {
+                                            ship: selected_ship.clone(),
+                                        },
+                                        self.name(),
+                                    ),
+                                    
+                                    
+                                    
+                                );
+                                push_command(
+                                    &trading_gui.msg_queue,
+                                    CommandRequest(Command::GetMyShips, self.name()),
+                                );
+
+                            }
+                            let mut response_data = ExpectLock!(trading_gui.response_data.lock());
+                            if let Some(v) = &response_data.ships_data {
+                                if v.1 == self.name() {
+                                    trading_gui.game_data.ship_data = Some(v.0.data.to_owned());
+                                    response_data.ships_data = None;
+                                }
+                            }
+
                         });
                     });
                 }

@@ -2,12 +2,15 @@ use crate::parse_system::System;
 use color_eyre::Result;
 use spacedust::{
     apis::{
-        agents_api::get_my_agent, configuration::Configuration, contracts_api::get_contracts,
-        default_api::register, fleet_api::get_my_ships,
+        agents_api::get_my_agent,
+        configuration::Configuration,
+        contracts_api::get_contracts,
+        default_api::register,
+        fleet_api::{get_my_ships, refuel_ship},
     },
     models::{
         register_request::Faction, GetContracts200Response, GetMyAgent200Response,
-        GetMyShips200Response, Register201Response, RegisterRequest,
+        GetMyShips200Response, RefuelShip200Response, Register201Response, RegisterRequest, Ship,
     },
 };
 use std::{
@@ -34,6 +37,7 @@ pub enum Command {
     GetConfig,
     GetMyContracts,
     GetUniverse,
+    Refuel { ship: Ship },
     Quit,
 }
 use crate::config::get_config_key;
@@ -51,6 +55,7 @@ pub struct CommandData {
     pub ships_data: Option<(GetMyShips200Response, ResponseID)>,
     pub contract_data: Option<(GetContracts200Response, ResponseID)>,
     pub universe_data: Option<(Vec<System>, ResponseID)>,
+    pub refuel_data: Option<(RefuelShip200Response, ResponseID)>,
 }
 
 pub fn run_backend(
@@ -111,6 +116,10 @@ pub fn run_backend(
                 Command::GetUniverse => {
                     response_data_lock.universe_data = UnwrapReq!(parse_json(), latest_cmd.1)
                 }
+                Command::Refuel { ship } => rt.block_on(async {
+                    response_data_lock.refuel_data =
+                        UnwrapReq!(refuel_ship(&config, &ship.symbol, 0).await, latest_cmd.1);
+                }),
             }
             drop(response_data_lock);
         }
