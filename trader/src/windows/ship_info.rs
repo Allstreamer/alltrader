@@ -306,8 +306,6 @@ impl ControlWindow for ShipInfoData {
                                 response_data.ships_data = None;
                             }
                         }
-                            },
-                        );
                     });
                 }
                 None => {}

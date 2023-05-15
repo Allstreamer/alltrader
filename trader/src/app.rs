@@ -15,7 +15,6 @@ use crate::{
 };
 use egui::Ui;
 
-
 fn load_icon() -> eframe::IconData {
     let (icon_rgba, icon_width, icon_height) = {
         let icon = include_bytes!("../res/icon.png");
