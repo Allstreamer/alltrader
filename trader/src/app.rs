@@ -9,7 +9,7 @@ use crate::{
     utils::ExpectLock,
     windows::{
         agent::AgentData, auth::AuthMenuData, contracts::ContractsData, ship_info::ShipInfoData,
-        ships::ShipMenuData,
+        ships::ShipMenuData, contract_info::ContractInfoData,
     },
 };
 pub fn gui_main(
@@ -54,6 +54,7 @@ impl TradingGUI {
                 Box::<ShipMenuData>::default(),
                 Box::<ShipInfoData>::default(),
                 Box::<ContractsData>::default(),
+                Box::<ContractInfoData>::default(),
             ])),
             msg_queue,
             response_data,

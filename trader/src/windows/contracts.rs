@@ -20,8 +20,8 @@ impl ControlWindow for ContractsData {
                     .show(ui, |ui| {
                         for contract in contract_list {
                             ui.selectable_value(
-                                &mut self.selected_contract,
-                                contract.id.clone(),
+                                &mut trading_gui.game_data.selected_contract,
+                                Some(contract.clone()),
                                 &contract.id.clone(),
                             );
                             ui.end_row();
