@@ -17,11 +17,11 @@ jobs:
         name: Cargo Check
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v2
             - name: Install latest ${{ matrix.toolchain }}
               uses: actions-rs/toolchain@v1
               with:
                 toolchain: ${{ matrix.toolchain }}
+            - uses: actions/checkout@v2
             - uses: actions/cache@v3
               with:
                 path: |
@@ -30,6 +30,7 @@ jobs:
                   ~/.cargo/registry/cache/
                   ~/.cargo/git/db/
                   target/
+                key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
             - name: Cargo Check
               run: cargo check --release
 
