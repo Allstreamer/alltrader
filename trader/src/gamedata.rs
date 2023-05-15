@@ -6,4 +6,5 @@ pub struct GameData {
     pub ship_data: Option<Vec<Ship>>,
     pub selected_ship: Option<Ship>,
     pub contract_data: Option<Vec<Contract>>,
+    pub selected_contract: Option<Contract>,
 }
