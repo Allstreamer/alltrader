@@ -1,6 +1,3 @@
-<img src="logo.png"
-     alt="LOGO"
-     style="width: 20%" />
 # All-Trader (WIP)
 A GUI for the V2 [Space-Traders](https://spacetraders.io/) API game
 

@@ -4,6 +4,7 @@ use crate::{
 };
 #[derive(Debug, Default)]
 pub struct ContractsData {
+    selected_contract: String,
     visible: bool,
 }
 
@@ -19,8 +20,8 @@ impl ControlWindow for ContractsData {
                     .show(ui, |ui| {
                         for contract in contract_list {
                             ui.selectable_value(
-                                &mut trading_gui.game_data.selected_contract,
-                                Some(contract.clone()),
+                                &mut self.selected_contract,
+                                contract.id.clone(),
                                 &contract.id.clone(),
                             );
                             ui.end_row();
