@@ -13,6 +13,7 @@ use crate::{
         world_explorer::WorldExplorerData,
     },
 };
+use egui::Ui;
 pub fn gui_main(
     msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     response_data: Arc<Mutex<CommandData>>,
@@ -77,6 +78,7 @@ impl eframe::App for TradingGUI {
                         push_command(&self.msg_queue, CommandRequest(Command::Quit, "".into()));
                     }
                 });
+                global_dark_light_mode_buttons(ui);
             });
         });
 
@@ -112,4 +114,11 @@ impl eframe::App for TradingGUI {
             }
         }
     }
+}
+
+/// Show larger buttons for switching between light and dark mode (globally).
+pub fn global_dark_light_mode_buttons(ui: &mut Ui) {
+    let mut visuals = ui.ctx().style().visuals.clone();
+    visuals.light_dark_radio_buttons(ui);
+    ui.ctx().set_visuals(visuals);
 }

@@ -189,15 +189,11 @@ impl ControlWindow for ShipInfoData {
                                         },
                                         self.name(),
                                     ),
-                                    
-                                    
-                                    
                                 );
                                 push_command(
                                     &trading_gui.msg_queue,
                                     CommandRequest(Command::GetMyShips, self.name()),
                                 );
-
                             }
                             let mut response_data = ExpectLock!(trading_gui.response_data.lock());
                             if let Some(v) = &response_data.ships_data {
@@ -206,7 +202,6 @@ impl ControlWindow for ShipInfoData {
                                     response_data.ships_data = None;
                                 }
                             }
-
                         });
                     });
                 }
