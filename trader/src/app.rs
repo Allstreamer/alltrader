@@ -10,8 +10,10 @@ use crate::{
     windows::{
         agent::AgentData, auth::AuthMenuData, contract_info::ContractInfoData,
         contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData,
+        world_explorer::WorldExplorerData,
     },
 };
+use egui::Ui;
 
 fn load_icon() -> eframe::IconData {
     let (icon_rgba, icon_width, icon_height) = {
@@ -75,6 +77,7 @@ impl TradingGUI {
                 Box::<ShipInfoData>::default(),
                 Box::<ContractsData>::default(),
                 Box::<ContractInfoData>::default(),
+                Box::<WorldExplorerData>::default(),
             ])),
             msg_queue,
             response_data,
@@ -95,6 +98,7 @@ impl eframe::App for TradingGUI {
                         push_command(&self.msg_queue, CommandRequest(Command::Quit, "".into()));
                     }
                 });
+                global_dark_light_mode_buttons(ui);
             });
         });
 
@@ -130,4 +134,11 @@ impl eframe::App for TradingGUI {
             }
         }
     }
+}
+
+/// Show larger buttons for switching between light and dark mode (globally).
+pub fn global_dark_light_mode_buttons(ui: &mut Ui) {
+    let mut visuals = ui.ctx().style().visuals.clone();
+    visuals.light_dark_radio_buttons(ui);
+    ui.ctx().set_visuals(visuals);
 }

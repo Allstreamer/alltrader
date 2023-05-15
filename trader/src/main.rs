@@ -8,6 +8,7 @@ mod app;
 mod backend;
 mod config;
 mod gamedata;
+mod parse_system;
 mod utils;
 mod windows;
 
