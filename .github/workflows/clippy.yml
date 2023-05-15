@@ -1,0 +1,30 @@
+name: Check lint
+
+on:
+    pull_request:
+    push:
+        branches: ["master"]
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    check_lint_rust:
+        name: Check lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/cache@v3
+              with:
+                path: |
+                    ~/.cargo/bin/
+                    ~/.cargo/registry/index/
+                    ~/.cargo/registry/cache/
+                    ~/.cargo/git/db/
+                    target/
+                key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            - uses: actions/checkout@v2
+            - name: Check lint
+              run: |
+                  rustup component add clippy
+                  set env RUSTFLAGS="-Dwarnings"
+                  cargo clippy --workspace -- -D warnings
