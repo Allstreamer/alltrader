@@ -8,8 +8,8 @@ use crate::{
     gamedata::GameData,
     utils::ExpectLock,
     windows::{
-        agent::AgentData, auth::AuthMenuData, contracts::ContractsData, ship_info::ShipInfoData,
-        ships::ShipMenuData, contract_info::ContractInfoData,
+        agent::AgentData, auth::AuthMenuData, contract_info::ContractInfoData,
+        contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData,
     },
 };
 pub fn gui_main(

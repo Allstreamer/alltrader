@@ -4,7 +4,6 @@ use crate::{
 };
 #[derive(Debug, Default)]
 pub struct ContractsData {
-    selected_contract: String,
     visible: bool,
 }
 
