@@ -268,7 +268,6 @@ impl ControlWindow for ShipInfoData {
                                     "Fuel: {}/{}",
                                     selected_ship.fuel.current, selected_ship.fuel.capacity
                                 ));
-
                                 egui::Grid::new("cargo_inventory_grid").num_columns(2).show(
                                     ui,
                                     |ui| {
@@ -307,6 +306,8 @@ impl ControlWindow for ShipInfoData {
                                 response_data.ships_data = None;
                             }
                         }
+                            },
+                        );
                     });
                 }
                 None => {}

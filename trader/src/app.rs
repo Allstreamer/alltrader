@@ -14,6 +14,8 @@ use crate::{
     },
 };
 use egui::Ui;
+
+
 fn load_icon() -> eframe::IconData {
     let (icon_rgba, icon_width, icon_height) = {
         let icon = include_bytes!("../res/icon.png");
@@ -31,6 +33,7 @@ fn load_icon() -> eframe::IconData {
         height: icon_height,
     }
 }
+
 pub fn gui_main(
     msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     response_data: Arc<Mutex<CommandData>>,

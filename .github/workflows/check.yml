@@ -17,7 +17,6 @@ jobs:
         name: Cargo Check
         runs-on: ${{ matrix.os }}
         steps:
-
             - name: Install latest ${{ matrix.toolchain }}
               uses: actions-rs/toolchain@v1
               with:
