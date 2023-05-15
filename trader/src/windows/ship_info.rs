@@ -268,22 +268,8 @@ impl ControlWindow for ShipInfoData {
                                     "Fuel: {}/{}",
                                     selected_ship.fuel.current, selected_ship.fuel.capacity
                                 ));
-                                egui::Grid::new("cargo_inventory_grid").num_columns(2).show(
-                                    ui,
-                                    |ui| {
-                                        for item in &selected_ship.cargo.inventory {
-                                            ui.label(&item.name);
-                                            ui.label(format!("x{}", item.units));
-                                            ui.end_row();
-                                        }
-                                    },
-                                )
                             },
                         );
-                        ui.label(format!(
-                            "Fuel: {}/{}",
-                            selected_ship.fuel.current, selected_ship.fuel.capacity
-                        ));
                         if ui.button("Refuel").clicked() {
                             push_command(
                                 &trading_gui.msg_queue,
