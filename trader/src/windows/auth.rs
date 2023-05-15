@@ -66,6 +66,18 @@ impl ControlWindow for AuthMenuData {
                     CommandRequest(Command::GetMyAgent, self.name()),
                 );
             }
+            ui.separator();
+            ui.heading("Get Agent");
+            if ui.button("Get").clicked() {
+                push_command(
+                    &trading_gui.msg_queue,
+                    CommandRequest(Command::GetConfig, self.name()),
+                );
+                push_command(
+                    &trading_gui.msg_queue,
+                    CommandRequest(Command::GetMyAgent, self.name()),
+                );
+            }
         });
 
         {

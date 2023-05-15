@@ -1,6 +1,5 @@
 use crate::app::{ControlWindow, TradingGUI};
 
-
 #[derive(Debug, Default)]
 pub struct ShipInfoData {
     visible: bool,
@@ -8,9 +7,7 @@ pub struct ShipInfoData {
 
 impl ControlWindow for ShipInfoData {
     fn draw(&mut self, trading_gui: &mut TradingGUI, ctx: &egui::Context) {
-        egui::Window::new(self.name()).show(ctx, |ui| {
-            
-        });
+        egui::Window::new(self.name()).show(ctx, |ui| {});
     }
 
     fn name(&self) -> String {

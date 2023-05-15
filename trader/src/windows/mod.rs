@@ -1,4 +1,5 @@
 pub mod agent;
 pub mod auth;
-pub mod ships;
+pub mod contracts;
 pub mod ship_info;
+pub mod ships;

@@ -6,9 +6,11 @@ use std::{
 use crate::{
     backend::{push_command, Command, CommandData, CommandRequest},
     gamedata::GameData,
-    windows::{agent::AgentData, auth::AuthMenuData, ships::ShipMenuData, ship_info::ShipInfoData}, utils::ExpectLock,
+    utils::ExpectLock,
+    windows::{
+        agent::AgentData, auth::AuthMenuData, contracts::ContractsData, ships::ShipMenuData,
+    },
 };
-
 pub fn gui_main(
     msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     response_data: Arc<Mutex<CommandData>>,
@@ -49,7 +51,7 @@ impl TradingGUI {
                 Box::<AuthMenuData>::default(),
                 Box::<AgentData>::default(),
                 Box::<ShipMenuData>::default(),
-                Box::<ShipInfoData>::default(),
+                Box::<ContractsData>::default(),
             ])),
             msg_queue,
             response_data,
