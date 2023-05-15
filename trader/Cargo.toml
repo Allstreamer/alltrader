@@ -9,11 +9,6 @@ tracing = "0.1"
 tracing-subscriber = "0.3"
 tokio = {version = "1", features = ["full"]}
 futures = "0.3"
-dotenv = "0.15"
-dotenv_codegen = "0.15"
-colored = "2.0"
-image = "0.24"
-chrono = "0.4"
 spacedust = "1.0.5"
 eframe = {version = "0.21", features = ["persistence"]}
 egui = "0.21"
