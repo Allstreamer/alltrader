@@ -2785,6 +2785,7 @@ dependencies = [
  "futures",
  "rust-ini",
  "serde",
+ "serde_json",
  "spacedust",
  "tokio",
  "tracing",

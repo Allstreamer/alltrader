@@ -10,6 +10,7 @@ use crate::{
     windows::{
         agent::AgentData, auth::AuthMenuData, contract_info::ContractInfoData,
         contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData,
+        world_explorer::WorldExplorerData,
     },
 };
 pub fn gui_main(
@@ -55,6 +56,7 @@ impl TradingGUI {
                 Box::<ShipInfoData>::default(),
                 Box::<ContractsData>::default(),
                 Box::<ContractInfoData>::default(),
+                Box::<WorldExplorerData>::default(),
             ])),
             msg_queue,
             response_data,
