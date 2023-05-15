@@ -98,14 +98,12 @@ pub fn run_backend(
                     let token = get_config_key("spacetraders", "token");
                     config.bearer_access_token = Some(token);
                 }
-                Command::GetMyContracts => {
-                    rt.block_on(async {
-                        response_data_lock.contract_data = UnwrapReq!(
-                            get_contracts(&config, Some(1), Some(20)).await,
-                            latest_cmd.1
-                        );
-                    })
-                }
+                Command::GetMyContracts => rt.block_on(async {
+                    response_data_lock.contract_data = UnwrapReq!(
+                        get_contracts(&config, Some(1), Some(20)).await,
+                        latest_cmd.1
+                    );
+                }),
             }
             drop(response_data_lock);
         }

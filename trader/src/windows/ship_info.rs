@@ -41,8 +41,7 @@ impl ControlWindow for ShipInfoData {
                                         ui.label("Crew Count:");
                                         ui.label(format!(
                                             "{}/{}",
-                                            selected_ship.crew.current,
-                                            selected_ship.crew.capacity
+                                            selected_ship.crew.current, selected_ship.crew.capacity
                                         ));
                                         ui.end_row();
 
