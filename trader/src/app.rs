@@ -14,11 +14,29 @@ use crate::{
     },
 };
 use egui::Ui;
+fn load_icon() -> eframe::IconData {
+    let (icon_rgba, icon_width, icon_height) = {
+        let icon = include_bytes!("../res/icon.png");
+        let image = image::load_from_memory(icon)
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+
+    eframe::IconData {
+        rgba: icon_rgba,
+        width: icon_width,
+        height: icon_height,
+    }
+}
 pub fn gui_main(
     msg_queue: Arc<Mutex<VecDeque<CommandRequest>>>,
     response_data: Arc<Mutex<CommandData>>,
 ) -> eframe::Result<()> {
     let options = eframe::NativeOptions {
+        icon_data: Some(load_icon()),
         initial_window_size: Some(egui::vec2(1280.0, 720.0)),
         ..Default::default()
     };
