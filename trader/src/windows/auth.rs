@@ -23,7 +23,7 @@ impl ControlWindow for AuthMenuData {
             egui::TextEdit::singleline(&mut self.temp_agent_name)
                 .hint_text("Agency Name")
                 .show(ui);
-                egui::TextEdit::singleline(&mut self.email)
+            egui::TextEdit::singleline(&mut self.email)
                 .hint_text("Email: (for donators)")
                 .show(ui);
 
@@ -46,7 +46,7 @@ impl ControlWindow for AuthMenuData {
                         Command::Register {
                             symbol: self.temp_agent_name.clone(),
                             faction: self.temp_faction,
-                            email: self.email.clone()
+                            email: self.email.clone(),
                         },
                         self.name(),
                     ),
