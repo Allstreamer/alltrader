@@ -112,8 +112,9 @@ pub fn run_backend(
                     email,
                 } => rt.block_on(async {
                     let mut request = RegisterRequest::new(faction, symbol);
-                    request.email = Some(email);
-
+                    if !email.is_empty() {
+                        request.email = Some(email);
+                    }
                     response_data_lock.register_data =
                         UnwrapReq!(register(&config, Some(request)).await, latest_cmd.1);
                 }),
