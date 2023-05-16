@@ -2711,9 +2711,9 @@ dependencies = [
 
 [[package]]
 name = "spacedust"
-version = "1.0.5"
+version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71d5430f05fdd535ec229afdcf5f62cc92510daa3431df89223f403b23c9fe51"
+checksum = "4b9ae047dd70bbf427bed49874571acde074f2db12d16815802d37e55f6e1fa6"
 dependencies = [
  "reqwest",
  "reqwest-middleware",

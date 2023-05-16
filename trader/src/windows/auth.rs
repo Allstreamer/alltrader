@@ -12,6 +12,7 @@ pub struct AuthMenuData {
     temp_agent_name: String,
     temp_token: String,
     temp_faction: Faction,
+    email: String,
     visible: bool,
 }
 
@@ -21,6 +22,9 @@ impl ControlWindow for AuthMenuData {
             ui.heading("Create Agent");
             egui::TextEdit::singleline(&mut self.temp_agent_name)
                 .hint_text("Agency Name")
+                .show(ui);
+                egui::TextEdit::singleline(&mut self.email)
+                .hint_text("Email: (for donators)")
                 .show(ui);
 
             egui::ComboBox::from_label("Select Faction")
@@ -42,6 +46,7 @@ impl ControlWindow for AuthMenuData {
                         Command::Register {
                             symbol: self.temp_agent_name.clone(),
                             faction: self.temp_faction,
+                            email: self.email.clone()
                         },
                         self.name(),
                     ),
