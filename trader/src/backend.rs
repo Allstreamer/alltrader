@@ -9,8 +9,9 @@ use spacedust::{
         fleet_api::{get_my_ships, refuel_ship},
     },
     models::{
-        register_request::Faction, GetContracts200Response, GetMyAgent200Response,
-        GetMyShips200Response, RefuelShip200Response, Register201Response, RegisterRequest, Ship,
+        register_request::Faction, register_request::RegisterRequest, GetContracts200Response,
+        GetMyAgent200Response, GetMyShips200Response, RefuelShip200Response, Register201Response,
+        Ship,
     },
 };
 use std::{
@@ -30,14 +31,22 @@ pub struct CommandRequest(pub Command, pub ResponseID);
 
 #[derive(Debug)]
 pub enum Command {
-    Register { symbol: String, faction: Faction },
-    SetToken { token: String },
+    Register {
+        symbol: String,
+        faction: Faction,
+        email: String,
+    },
+    SetToken {
+        token: String,
+    },
     GetMyShips,
     GetMyAgent,
     GetConfig,
     GetMyContracts,
     GetUniverse,
-    Refuel { ship: Ship },
+    Refuel {
+        ship: Ship,
+    },
     Quit,
 }
 use crate::config::get_config_key;
@@ -97,11 +106,17 @@ pub fn run_backend(
                         );
                     })
                 }
-                Command::Register { symbol, faction } => rt.block_on(async {
-                    response_data_lock.register_data = UnwrapReq!(
-                        register(&config, Some(RegisterRequest::new(faction, symbol))).await,
-                        latest_cmd.1
-                    );
+                Command::Register {
+                    symbol,
+                    faction,
+                    email,
+                } => rt.block_on(async {
+                    let mut request = RegisterRequest::new(faction, symbol);
+                    if !email.is_empty() {
+                        request.email = Some(email);
+                    }
+                    response_data_lock.register_data =
+                        UnwrapReq!(register(&config, Some(request)).await, latest_cmd.1);
                 }),
                 Command::GetConfig => {
                     let token = get_config_key("spacetraders", "token");

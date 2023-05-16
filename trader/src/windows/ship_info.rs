@@ -47,13 +47,9 @@ impl ControlWindow for ShipInfoData {
                                     egui::Grid::new("registration_ship_info_grid")
                                         .num_columns(2)
                                         .show(ui, |ui| {
-                                            if let Some(faction_symbol) =
-                                                &selected_ship.registration.faction_symbol
-                                            {
-                                                ui.label("Faction:");
-                                                ui.label(faction_symbol);
-                                                ui.end_row();
-                                            }
+                                            ui.label("Faction:");
+                                            ui.label(&selected_ship.registration.faction_symbol);
+                                            ui.end_row();
 
                                             ui.label("Role:");
                                             ui.label(&selected_ship.registration.role.to_string());
