@@ -3,7 +3,7 @@ use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
 use crate::utils::ExpectLock;
-use egui::plot::{MarkerShape, Points};
+use egui::plot::{Line, MarkerShape, PlotPoints, Points};
 use egui::*;
 use plot::{Corner, Legend, Plot, PlotPoint, Text};
 #[derive(Debug, Default)]
@@ -36,19 +36,29 @@ impl ControlWindow for WorldExplorerData {
                 plot.show(ui, |plot_ui| {
                     // Here is some code for debugging the plot bounds:
                     //
-                    // After zooming in to about a scale of less that 1500
+                    // After zooming in to about a scale of less that 500.0
                     // start rendering text
-                    const TEXT_RENDER_LEVEL: f64 = 500.0;
+                    const TEXT_RENDER_LEVEL: f64 = 100.0;
+
+                    // Still render Systems that are 1 unit outside of the view of the grapth
+                    // This is to allow systems to render even if the center of the system
+                    // isnt in view, since plants that belong to that system may still be in view.
+                    const SYSTEM_CULL_LENIENCY: f64 = 1.0;
+
                     let render_text = plot_ui.plot_bounds().width() < TEXT_RENDER_LEVEL;
 
                     for system in universe_list {
-                        if (plot_ui.plot_bounds().min()[0] > system.x as f64)
-                            || ((system.x as f64) > plot_ui.plot_bounds().max()[0])
-                            || (plot_ui.plot_bounds().min()[1] > system.y as f64)
-                            || ((system.y as f64) > plot_ui.plot_bounds().max()[1])
+                        if (plot_ui.plot_bounds().min()[0] - SYSTEM_CULL_LENIENCY > system.x as f64)
+                            || ((system.x as f64)
+                                > plot_ui.plot_bounds().max()[0] + SYSTEM_CULL_LENIENCY)
+                            || (plot_ui.plot_bounds().min()[1] - SYSTEM_CULL_LENIENCY
+                                > system.y as f64)
+                            || ((system.y as f64)
+                                > plot_ui.plot_bounds().max()[1] + SYSTEM_CULL_LENIENCY)
                         {
                             continue;
                         }
+
                         if systems_to_render.contains(&&system.symbol)
                             || !self.only_show_systems_with_ships
                         {
@@ -74,19 +84,36 @@ impl ControlWindow for WorldExplorerData {
 
                             if render_text {
                                 for waypoint in &system.waypoints {
+                                    // Waypoints usualy spread around 200 units around their base system
+                                    // and systems are usually 2 units apart at the core of the galaxy
+                                    let waypoint_x =
+                                        system.x as f64 + (waypoint.y as f64 / 200.0) * 2.0;
+                                    let waypoint_y =
+                                        system.y as f64 + (waypoint.x as f64 / 200.0) * 2.0;
+
+                                    // Basic Point to point distance function
+                                    let waypoint_distance_from_system =
+                                        ((system.x as f64 - waypoint_x).powf(2.0)
+                                            + (system.y as f64 - waypoint_y).powf(2.0))
+                                        .sqrt();
+
+                                    plot_ui.line(circle(
+                                        system.x as f64,
+                                        system.y as f64,
+                                        waypoint_distance_from_system,
+                                    ));
                                     plot_ui.text(
                                         Text::new(
-                                            PlotPoint::new(
-                                                // Waypoints usualy spread around 200 units around their base system
-                                                // and systems are usually 2 units apart at the core of the galaxy
-                                                system.x as f64 + (waypoint.y as f64 / 200.0) * 2.0,
-                                                system.y as f64 + (waypoint.x as f64 / 200.0) * 2.0,
-                                            ),
+                                            PlotPoint::new(waypoint_x, waypoint_y + 0.02),
                                             &waypoint.symbol,
                                         )
                                         .name("Waypoint")
-                                        .color(Color32::BLUE),
+                                        .color(Color32::WHITE),
                                     );
+                                    let points = Points::new(vec![[waypoint_x, waypoint_y]])
+                                        .radius(6.0)
+                                        .shape(MarkerShape::Diamond);
+                                    plot_ui.points(points);
                                 }
                             }
                         }
@@ -139,4 +166,20 @@ impl ControlWindow for WorldExplorerData {
 
 fn map_range(from_range: (f64, f64), to_range: (f64, f64), s: f64) -> f64 {
     to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
+}
+
+// https://github.com/emilk/egui/blob/7b76161a6a7e33a72e7331c1725758608c16ff30/crates/egui_demo_lib/src/demo/plot_demo.rs#LL225C15-L225C15
+fn circle(x: f64, y: f64, radius: f64) -> Line {
+    let n = 512;
+    let circle_points: PlotPoints = (0..=n)
+        .map(|i| {
+            let t = remap(i as f64, 0.0..=(n as f64), 0.0..=std::f64::consts::TAU);
+            let r = radius;
+            [r * t.cos() + x, r * t.sin() + y]
+        })
+        .collect();
+    Line::new(circle_points)
+        .color(Color32::from_rgb(100, 200, 100))
+        .style(plot::LineStyle::Dashed { length: 10.0 })
+        .name("orbits")
 }
