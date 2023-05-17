@@ -43,6 +43,11 @@ impl ControlWindow for WorldExplorerData {
                     let render_text = plot_ui.plot_bounds().width() < TEXT_RENDER_LEVEL;
 
                     for system in universe_list {
+                        if system.x.abs() as f64 > plot_ui.plot_bounds().width()
+                            || system.y.abs() as f64 > plot_ui.plot_bounds().height()
+                        {
+                            continue;
+                        }
                         if systems_to_render.contains(&&system.symbol)
                             || !self.only_show_systems_with_ships
                         {
