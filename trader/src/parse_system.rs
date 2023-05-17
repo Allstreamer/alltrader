@@ -1,10 +1,13 @@
+use color_eyre::eyre::Context;
 use reqwest::Url;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::copy;
 use std::io::Read;
-#[derive(Debug, Clone, Default, Deserialize)]
 
+use crate::utils::Here;
+
+#[derive(Debug, Clone, Default, Deserialize)]
 pub struct Waypoint {
     pub symbol: String,
     pub r#type: String,
@@ -38,23 +41,16 @@ pub fn parse_json() -> color_eyre::Result<Vec<System>> {
             // Read the file content into a string
             let mut contents = String::new();
 
-            match file.read_to_string(&mut contents) {
-                Ok(_) => match serde_json::from_str(&contents) {
-                    Ok(systems) => {
-                        println!("File parsed successfully");
-                        Ok(systems)
-                    }
-                    Err(error) => {
-                        println!("Failed to parse file: {}", error);
-                        Err(error.into())
-                    }
-                },
-                Err(error) => {
-                    println!("Failed to read file: {}", error);
-                    Err(error.into())
-                }
-            }
-
+            file.read_to_string(&mut contents).wrap_err(format!(
+                "{} Failed to read file: {}",
+                Here!(),
+                file_path
+            ))?;
+            // In the future we may wanna fall back to downloading
+            let parsed_json = serde_json::from_str(&contents)
+                .wrap_err(format!("{} Failed to parse file!", Here!()));
+            println!("File parsed successfully");
+            parsed_json
             // Deserialize the JSON into a Vec<System>
         }
         Err(error) => {
@@ -68,10 +64,13 @@ pub fn parse_json() -> color_eyre::Result<Vec<System>> {
                     println!("File downloaded successfully");
                     let mut file = File::open(file_path).unwrap();
                     let mut contents = String::new();
-                    file.read_to_string(&mut contents)
-                        .expect("Failed to read file");
-                    let systems: Vec<System> =
-                        serde_json::from_str(&contents).expect("Failed to parse JSON");
+                    file.read_to_string(&mut contents).wrap_err(format!(
+                        "{} Failed to read file: {}",
+                        Here!(),
+                        file_path
+                    ))?;
+                    let systems: Vec<System> = serde_json::from_str(&contents)
+                        .wrap_err(format!("{} Failed to parse JSON!", Here!()))?;
                     return Ok(systems);
                 }
                 Err(error) => {
@@ -83,7 +82,7 @@ pub fn parse_json() -> color_eyre::Result<Vec<System>> {
     }
 }
 
-fn download_file(url: &str, file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn download_file(url: &str, file_path: &str) -> color_eyre::Result<()> {
     // Parse the URL
     let url = Url::parse(url)?;
 

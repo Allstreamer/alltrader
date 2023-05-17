@@ -15,5 +15,13 @@ macro_rules! ExpectLock {
         $lock_get.expect("Tried to aquire lock on Mutex that was owned by panicked thread!")
     };
 }
+
+macro_rules! Here {
+    () => {
+        format!("{} - {}:{}", file!(), line!(), column!())
+    };
+}
+
 pub(crate) use ExpectLock;
+pub(crate) use Here;
 pub(crate) use UnwrapReq;
