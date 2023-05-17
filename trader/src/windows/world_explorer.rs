@@ -45,7 +45,12 @@ impl ControlWindow for WorldExplorerData {
                             for waypoint in &system.waypoints {
                                 plot_ui.text(
                                     Text::new(
-                                        PlotPoint::new(waypoint.y, waypoint.x),
+                                        PlotPoint::new(
+                                            // Waypoints usualy spread around 200 units around their base system
+                                            // and systems are usually 2 units apart at the core of the galaxy
+                                            system.y as f64 + (waypoint.y as f64 / 200.0) * 2.0,
+                                            system.x as f64 + (waypoint.x as f64 / 200.0) * 2.0,
+                                        ),
                                         &waypoint.symbol,
                                     )
                                     .name("Waypoint")
