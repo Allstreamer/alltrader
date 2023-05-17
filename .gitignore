@@ -3,3 +3,4 @@ openapitools.json
 /target
 /config/config.ini
 /config/systems.json
+Cargo.lock
