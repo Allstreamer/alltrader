@@ -129,6 +129,7 @@ pub fn run_backend(
                     );
                 }),
                 Command::GetUniverse => {
+                    // clippy notice ErrReport should be used. 
                     response_data_lock.universe_data = UnwrapReq!(parse_json(), latest_cmd.1)
                 }
                 Command::Refuel { ship } => rt.block_on(async {

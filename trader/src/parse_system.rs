@@ -28,7 +28,7 @@ pub struct System {
     pub factions: Vec<Faction>,
 }
 
-pub fn parse_json() -> Result<Vec<System>, std::io::Error> {
+pub fn parse_json() -> color_eyre::Result<Vec<System>> {
     let file_path = "./config/systems.json";
     // Open the file in read-only mode
     let file = File::open(file_path);
@@ -37,12 +37,25 @@ pub fn parse_json() -> Result<Vec<System>, std::io::Error> {
             println!("File opened successfully");
             // Read the file content into a string
             let mut contents = String::new();
-            file.read_to_string(&mut contents)
-                .expect("Failed to read file");
+
+            match file.read_to_string(&mut contents) {
+                Ok(_) => match serde_json::from_str(&contents) {
+                    Ok(systems) => {
+                        println!("File parsed successfully");
+                        Ok(systems)
+                    }
+                    Err(error) => {
+                        println!("Failed to parse file: {}", error);
+                        Err(error.into())
+                    }
+                },
+                Err(error) => {
+                    println!("Failed to read file: {}", error);
+                    Err(error.into())
+                }
+            }
+
             // Deserialize the JSON into a Vec<System>
-            let systems: Vec<System> =
-                serde_json::from_str(&contents).expect("Failed to parse JSON");
-            Ok(systems)
         }
         Err(error) => {
             println!("Failed to open file: {}", error);
@@ -65,7 +78,7 @@ pub fn parse_json() -> Result<Vec<System>, std::io::Error> {
                     println!("Failed to download file: {}", error);
                 }
             }
-            Err(error)
+            Err(error.into())
         }
     }
 }
