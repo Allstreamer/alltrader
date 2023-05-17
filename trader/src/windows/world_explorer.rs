@@ -3,8 +3,8 @@ use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
 use crate::utils::ExpectLock;
-use egui::*;
 use egui::plot::{MarkerShape, Points};
+use egui::*;
 use plot::{Corner, Legend, Plot, PlotPoint, Text};
 #[derive(Debug, Default)]
 pub struct WorldExplorerData {
@@ -39,7 +39,7 @@ impl ControlWindow for WorldExplorerData {
                     //
                     // After zooming in to about a scale of less that 1500
                     // start rendering text
-                    const TEXT_RENDER_LEVEL: f64 = 500.0; 
+                    const TEXT_RENDER_LEVEL: f64 = 500.0;
                     let render_text = plot_ui.plot_bounds().width() < TEXT_RENDER_LEVEL;
 
                     for system in universe_list {
@@ -52,14 +52,16 @@ impl ControlWindow for WorldExplorerData {
                                         .name("System")
                                         .color(Color32::RED),
                                 );
-                            }else {
+                            } else {
                                 let points = Points::new(vec![[system.y as f64, system.x as f64]])
                                     .radius(
                                         (map_range(
                                             (TEXT_RENDER_LEVEL, 20000.0),
                                             (6.0, 2.0),
-                                            plot_ui.plot_bounds().width()
-                                        ) as f32).max(2.0))
+                                            plot_ui.plot_bounds().width(),
+                                        ) as f32)
+                                            .max(2.0),
+                                    )
                                     .shape(MarkerShape::Asterisk);
                                 plot_ui.points(points);
                             }
