@@ -3,6 +3,7 @@ use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
 use crate::utils::ExpectLock;
+use egui::epaint::ahash::{HashMap, HashMapExt};
 use egui::plot::{Line, MarkerShape, PlotPoints, Points};
 use egui::*;
 use plot::{Corner, Legend, Plot, PlotPoint, Text};
@@ -83,7 +84,11 @@ impl ControlWindow for WorldExplorerData {
                             }
 
                             if render_text {
+                                let mut waypoint_record: HashMap<(i32, i32), u32> = HashMap::new();
                                 for waypoint in &system.waypoints {
+                                    let waypoint_entry = waypoint_record
+                                        .entry((waypoint.x, waypoint.y))
+                                        .or_insert(0);
                                     // Waypoints usualy spread around 200 units around their base system
                                     // and systems are usually 2 units apart at the core of the galaxy
                                     let waypoint_x =
@@ -91,25 +96,37 @@ impl ControlWindow for WorldExplorerData {
                                     let waypoint_y =
                                         system.y as f64 + (waypoint.x as f64 / 200.0) * 2.0;
 
+                                    // Shift waypoint label by 0.1 for each duplicate position
+                                    let waypoint_text_y =
+                                        waypoint_y + (*waypoint_entry as f64 * 0.005);
+                                    *waypoint_entry += 1;
+
                                     // Basic Point to point distance function
                                     let waypoint_distance_from_system =
                                         ((system.x as f64 - waypoint_x).powf(2.0)
                                             + (system.y as f64 - waypoint_y).powf(2.0))
                                         .sqrt();
 
+                                    // Draw Orbit
                                     plot_ui.line(circle(
                                         system.x as f64,
                                         system.y as f64,
                                         waypoint_distance_from_system,
                                     ));
+
+                                    // Draw waypoint label
                                     plot_ui.text(
                                         Text::new(
-                                            PlotPoint::new(waypoint_x, waypoint_y + 0.02),
+                                            // Text is offset on the y-axis to give space for the waypoint
+                                            // icon
+                                            PlotPoint::new(waypoint_x, waypoint_text_y + 0.008),
                                             &waypoint.symbol,
                                         )
                                         .name("Waypoint")
                                         .color(Color32::WHITE),
                                     );
+
+                                    // Draw waypoint icon
                                     let points = Points::new(vec![[waypoint_x, waypoint_y]])
                                         .radius(6.0)
                                         .shape(MarkerShape::Diamond);
