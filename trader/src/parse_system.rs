@@ -1,6 +1,7 @@
 use color_eyre::eyre::Context;
 use reqwest::Url;
 use serde::Deserialize;
+use std::fs;
 use std::fs::File;
 use std::io::copy;
 use std::io::Read;
@@ -33,6 +34,7 @@ pub struct System {
 
 pub fn parse_json() -> color_eyre::Result<Vec<System>> {
     let file_path = "./config/systems.json";
+    fs::create_dir_all("./config/").ok();
     // Open the file in read-only mode
     let file = File::open(file_path);
     match file {

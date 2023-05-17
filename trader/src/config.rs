@@ -1,10 +1,27 @@
 use ini::Ini;
+use std::fs;
 
 fn get_config() -> Option<Ini> {
+    fs::create_dir_all("./config/").ok()?;
     let result = Ini::load_from_file("./config/config.ini");
+
     match result {
         Ok(ini) => Some(ini),
-        Err(_) => None,
+        Err(_) => {
+            // config was not found so lets create it
+            let create_result = fs::File::create("./config/config.ini");
+            match create_result {
+                Ok(_) => {
+                    let ini = Ini::new();
+                    drop(ini.write_to_file("./config/config.ini"));
+                    Some(ini)
+                }
+                Err(_) => {
+                    None
+                    //println!("Error creating config file");
+                }
+            }
+        }
     }
 }
 pub fn get_config_key(section: &str, key: &str) -> String {
