@@ -3,7 +3,7 @@ macro_rules! UnwrapReq {
         match $req {
             Ok(v) => Some((v, $id)),
             Err(e) => {
-                dbg!(e);
+                dbg!(&e);
                 None
             }
         }
