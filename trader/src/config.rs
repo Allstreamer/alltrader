@@ -24,16 +24,33 @@ fn get_config() -> Option<Ini> {
         }
     }
 }
-pub fn get_config_key(section: &str, key: &str) -> String {
+pub fn get_config_key(section: &str, key: &str) -> Option<String> {
     let conf = get_config();
 
     if let Some(conf) = conf {
-        let section = conf.section(Some(section)).unwrap();
-        let value = section.get(key).unwrap();
-        value.to_string()
+        let section = conf.section(Some(section));
+        match section {
+            Some(section) => {
+                let value = section.get(key);
+                match value {
+                    Some(value) => {
+                        Some(value.to_string())
+                        //println!("{}", value);
+                    }
+                    None => {
+                        println!("Key not found");
+                        None
+                    }
+                }
+            }
+            None => {
+                println!("Section not found");
+                None
+            }
+        }
     } else {
         println!("Config file not found");
-        String::from("")
+        None
     }
 }
 pub fn set_config_key(section: &str, key: &str, value: &str) {
