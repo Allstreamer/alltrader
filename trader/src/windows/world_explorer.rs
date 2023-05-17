@@ -35,7 +35,6 @@ impl ControlWindow for WorldExplorerData {
             if let Some(universe_list) = &trading_gui.game_data.universe_data {
                 plot.show(ui, |plot_ui| {
                     // Here is some code for debugging the plot bounds:
-                    // println!("{:?}", plot_ui.plot_bounds().width());
                     //
                     // After zooming in to about a scale of less that 1500
                     // start rendering text
@@ -43,8 +42,10 @@ impl ControlWindow for WorldExplorerData {
                     let render_text = plot_ui.plot_bounds().width() < TEXT_RENDER_LEVEL;
 
                     for system in universe_list {
-                        if system.x.abs() as f64 > plot_ui.plot_bounds().width()
-                            || system.y.abs() as f64 > plot_ui.plot_bounds().height()
+                        if (plot_ui.plot_bounds().min()[0] > system.x as f64)
+                            || ((system.x as f64) > plot_ui.plot_bounds().max()[0])
+                            || (plot_ui.plot_bounds().min()[1] > system.y as f64)
+                            || ((system.y as f64) > plot_ui.plot_bounds().max()[1])
                         {
                             continue;
                         }
@@ -53,12 +54,12 @@ impl ControlWindow for WorldExplorerData {
                         {
                             if render_text {
                                 plot_ui.text(
-                                    Text::new(PlotPoint::new(system.y, system.x), &system.symbol)
+                                    Text::new(PlotPoint::new(system.x, system.y), &system.symbol)
                                         .name("System")
                                         .color(Color32::RED),
                                 );
                             } else {
-                                let points = Points::new(vec![[system.y as f64, system.x as f64]])
+                                let points = Points::new(vec![[system.x as f64, system.y as f64]])
                                     .radius(
                                         (map_range(
                                             (TEXT_RENDER_LEVEL, 20000.0),
@@ -78,8 +79,8 @@ impl ControlWindow for WorldExplorerData {
                                             PlotPoint::new(
                                                 // Waypoints usualy spread around 200 units around their base system
                                                 // and systems are usually 2 units apart at the core of the galaxy
-                                                system.y as f64 + (waypoint.y as f64 / 200.0) * 2.0,
-                                                system.x as f64 + (waypoint.x as f64 / 200.0) * 2.0,
+                                                system.x as f64 + (waypoint.y as f64 / 200.0) * 2.0,
+                                                system.y as f64 + (waypoint.x as f64 / 200.0) * 2.0,
                                             ),
                                             &waypoint.symbol,
                                         )
