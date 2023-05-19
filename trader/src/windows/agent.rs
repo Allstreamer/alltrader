@@ -1,7 +1,7 @@
 use crate::{
     app::{ControlWindow, TradingGUI},
     backend::{push_command, Command, CommandRequest},
-    utils::ExpectLock,
+    utils::ContinueLock,
 };
 
 #[derive(Debug, Default)]
@@ -43,7 +43,7 @@ impl ControlWindow for AgentData {
                     }
                 });
                 {
-                    let response_data = ExpectLock!(trading_gui.response_data.lock());
+                    let response_data = ContinueLock!(trading_gui.response_data.try_lock());
                     if let Some(v) = &response_data.agent_data {
                         if v.1 == self.name() {
                             trading_gui.game_data.agent_data = Some(*v.0.data.clone());

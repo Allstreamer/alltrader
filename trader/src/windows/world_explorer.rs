@@ -2,11 +2,12 @@ use crate::app::{ControlWindow, TradingGUI};
 use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
-use crate::utils::ExpectLock;
+use crate::utils::ContinueLock;
 use egui::epaint::ahash::{HashMap, HashMapExt};
 use egui::plot::{Line, MarkerShape, PlotPoints, Points};
 use egui::*;
 use plot::{Corner, Legend, Plot, PlotPoint, Text};
+
 #[derive(Debug, Default)]
 pub struct WorldExplorerData {
     only_show_systems_with_ships: bool,
@@ -162,7 +163,7 @@ impl ControlWindow for WorldExplorerData {
         });
 
         {
-            let mut response_data = ExpectLock!(trading_gui.response_data.lock());
+            let mut response_data = ContinueLock!(trading_gui.response_data.try_lock());
             if let Some(v) = &response_data.universe_data {
                 if v.1 == self.name() {
                     trading_gui.game_data.universe_data = Some(v.clone().0);

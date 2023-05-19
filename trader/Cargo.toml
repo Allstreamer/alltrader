@@ -8,7 +8,6 @@ color-eyre = "0.6"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tokio = {version = "1", features = ["full"]}
-futures = "0.3"
 spacedust = "1.0.6"
 eframe = {version = "0.21", features = ["persistence"]}
 egui = "0.21"
@@ -16,4 +15,4 @@ serde = {version = "1", features = ["derive"]}
 rust-ini = "0.19.0"
 serde_json = "1.0"
 image = "0.24.6"
-reqwest = { version = "0.11.18", features = ["blocking"] }
+reqwest = { version = "0.11.18" }

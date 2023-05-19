@@ -1,7 +1,7 @@
 use crate::{
     app::{ControlWindow, TradingGUI},
     backend::{push_command, Command, CommandRequest},
-    utils::ExpectLock,
+    utils::ContinueLock,
 };
 
 #[derive(Debug, Default)]
@@ -39,7 +39,7 @@ impl ControlWindow for ShipMenuData {
         });
 
         {
-            let mut response_data = ExpectLock!(trading_gui.response_data.lock());
+            let mut response_data = ContinueLock!(trading_gui.response_data.try_lock());
             if let Some(v) = &response_data.ships_data {
                 if v.1 == self.name() {
                     trading_gui.game_data.ship_data = Some(v.0.data.to_owned());

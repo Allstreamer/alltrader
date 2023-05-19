@@ -1,12 +1,10 @@
-use std::{
-    collections::VecDeque,
-    sync::{Arc, Mutex},
-};
+use std::{collections::VecDeque, sync::Arc};
+use tokio::sync::Mutex;
 
 use crate::{
     backend::{push_command, Command, CommandData, CommandRequest},
     gamedata::GameData,
-    utils::ExpectLock,
+    utils::ContinueLock,
     windows::{
         agent::AgentData, auth::AuthMenuData, contract_info::ContractInfoData,
         contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData,
@@ -109,7 +107,7 @@ impl eframe::App for TradingGUI {
                 egui::Layout::top_down(egui::Align::LEFT).with_cross_justify(true),
                 |ui| {
                     let menus = Arc::clone(&self.menus);
-                    let mut menus_lock = ExpectLock!(menus.lock());
+                    let mut menus_lock = ContinueLock!(menus.try_lock());
                     for menu in menus_lock.iter_mut() {
                         let menu_name = menu.name().to_owned();
                         ui.toggle_value(menu.visibility(), menu_name);
@@ -126,7 +124,7 @@ impl eframe::App for TradingGUI {
 
         {
             let menus = Arc::clone(&self.menus);
-            let mut menus_lock = ExpectLock!(menus.lock());
+            let mut menus_lock = ContinueLock!(menus.try_lock());
             for i in 0..menus_lock.len() {
                 if *menus_lock[i].visibility() {
                     menus_lock[i].draw(self, ctx);

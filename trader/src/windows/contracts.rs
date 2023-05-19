@@ -1,6 +1,7 @@
 use crate::{
     app::{ControlWindow, TradingGUI},
     backend::{push_command, Command, CommandRequest},
+    utils::ContinueLock,
 };
 #[derive(Debug, Default)]
 pub struct ContractsData {
@@ -37,7 +38,7 @@ impl ControlWindow for ContractsData {
             });
         });
         {
-            let mut response_data = trading_gui.response_data.lock().unwrap();
+            let mut response_data = ContinueLock!(trading_gui.response_data.try_lock());
             if let Some(v) = &response_data.contract_data {
                 if v.1 == self.name() {
                     trading_gui.game_data.contract_data = Some(v.0.data.to_owned());
