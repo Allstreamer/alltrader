@@ -1,8 +1,6 @@
 use color_eyre::Result;
-use std::{
-    collections::VecDeque,
-    sync::{Arc, Mutex},
-};
+use std::{collections::VecDeque, sync::Arc};
+use tokio::sync::Mutex;
 
 mod app;
 mod backend;

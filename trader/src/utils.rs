@@ -10,9 +10,15 @@ macro_rules! UnwrapReq {
     };
 }
 
-macro_rules! ExpectLock {
+/// This macro should only ever consume
+/// results from try_locks in the following format:
+/// Result<MutexGuard<'_, T>, TryLockError>
+macro_rules! ContinueLock {
     ($lock_get:expr) => {
-        $lock_get.expect("Tried to aquire lock on Mutex that was owned by panicked thread!")
+        match $lock_get {
+            Ok(v) => v,
+            _ => return,
+        }
     };
 }
 
@@ -22,6 +28,6 @@ macro_rules! Here {
     };
 }
 
-pub(crate) use ExpectLock;
+pub(crate) use ContinueLock;
 pub(crate) use Here;
 pub(crate) use UnwrapReq;

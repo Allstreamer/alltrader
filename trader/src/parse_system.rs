@@ -1,10 +1,10 @@
 use color_eyre::eyre::Context;
 use reqwest::Url;
 use serde::Deserialize;
-use std::fs;
-use std::fs::File;
-use std::io::copy;
-use std::io::Read;
+use tokio::fs;
+use tokio::fs::File;
+use tokio::io::AsyncReadExt;
+use tokio::io::AsyncWriteExt;
 
 use crate::utils::Here;
 
@@ -32,18 +32,18 @@ pub struct System {
     pub factions: Vec<Faction>,
 }
 
-pub fn parse_json() -> color_eyre::Result<Vec<System>> {
+pub async fn parse_json() -> color_eyre::Result<Vec<System>> {
     let file_path = "./config/systems.json";
-    fs::create_dir_all("./config/").ok();
+    fs::create_dir_all("./config/").await?;
     // Open the file in read-only mode
-    let file = File::open(file_path);
+    let file = File::open(file_path).await;
     match file {
         Ok(mut file) => {
             println!("File opened successfully");
             // Read the file content into a string
             let mut contents = String::new();
 
-            file.read_to_string(&mut contents).wrap_err(format!(
+            file.read_to_string(&mut contents).await.wrap_err(format!(
                 "{} Failed to read file: {}",
                 Here!(),
                 file_path
@@ -56,17 +56,18 @@ pub fn parse_json() -> color_eyre::Result<Vec<System>> {
             // Deserialize the JSON into a Vec<System>
         }
         Err(error) => {
-            println!("Failed to open file: {}", error);
+            println!("{} Failed to open file: {}", Here!(), error);
             let download_result = download_file(
                 "https://api.spacetraders.io/v2/systems.json",
                 "./config/systems.json",
-            );
+            )
+            .await;
             match download_result {
                 Ok(_) => {
                     println!("File downloaded successfully");
-                    let mut file = File::open(file_path).unwrap();
+                    let mut file = File::open(file_path).await.unwrap();
                     let mut contents = String::new();
-                    file.read_to_string(&mut contents).wrap_err(format!(
+                    file.read_to_string(&mut contents).await.wrap_err(format!(
                         "{} Failed to read file: {}",
                         Here!(),
                         file_path
@@ -84,18 +85,18 @@ pub fn parse_json() -> color_eyre::Result<Vec<System>> {
     }
 }
 
-fn download_file(url: &str, file_path: &str) -> color_eyre::Result<()> {
+async fn download_file(url: &str, file_path: &str) -> color_eyre::Result<()> {
     // Parse the URL
     let url = Url::parse(url)?;
 
     // Send a GET request to the URL and store the response in a variable
-    let mut response = reqwest::blocking::get(url)?;
+    let response = reqwest::get(url).await?;
+    let raw_response_data = response.text().await?;
 
     // Create a new file with the same name as the downloaded file and open it for writing
-    let mut file = File::create(file_path)?;
-
+    let mut file = File::create(file_path).await?;
     // Copy the contents of the response to the file
-    copy(&mut response, &mut file)?;
+    file.write_all(raw_response_data.as_bytes()).await?;
 
     Ok(())
 }
