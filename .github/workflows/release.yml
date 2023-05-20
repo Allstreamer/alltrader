@@ -30,4 +30,6 @@ jobs:
             - uses: actions/upload-artifact@v3
               with:
                 name: Alltrader-${{ runner.os }}
-                path: target/release/trader*
+                path: |
+                  target/release/trader
+                  target/release/trader.exe
