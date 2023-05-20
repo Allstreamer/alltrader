@@ -1,0 +1,32 @@
+on:
+    push:
+        branches: ["develop", "auto-release"] # auto-release only for testing
+
+jobs:
+  release:
+    name: release ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-pc-windows-gnu
+          - target: x86_64-unknown-linux-musl
+          - target: x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/cache@v3
+        with:
+          path: |
+              ~/.cargo/bin/
+              ~/.cargo/registry/index/
+              ~/.cargo/registry/cache/
+              ~/.cargo/git/db/
+              target/
+          key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Compile
+        run: cargo build --release --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Alltrader-${{ matrix.target }}
+          path: target/release/trader
