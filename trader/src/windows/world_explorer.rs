@@ -49,6 +49,14 @@ impl ControlWindow for WorldExplorerData {
 
                     let render_text = plot_ui.plot_bounds().width() < TEXT_RENDER_LEVEL;
 
+                    // HashMap::with_capacity(20) is here to prevent doing ~3 allocations
+                    // this assumes that every system will have 20 or less waypoints
+                    // this is also outside of the loop it's meant for so don't forget to
+                    // waypoint_record.clear() (this was also done to avoid reallocations)
+                    // (this map will actually have a capacity of 28 since that is the next
+                    //  bigest available size to 20)
+                    let mut waypoint_record: HashMap<(i32, i32), u32> = HashMap::with_capacity(20);
+
                     for system in universe_list {
                         if (plot_ui.plot_bounds().min()[0] - SYSTEM_CULL_LENIENCY > system.x as f64)
                             || ((system.x as f64)
@@ -85,7 +93,6 @@ impl ControlWindow for WorldExplorerData {
                             }
 
                             if render_text {
-                                let mut waypoint_record: HashMap<(i32, i32), u32> = HashMap::new();
                                 for waypoint in &system.waypoints {
                                     let waypoint_entry = waypoint_record
                                         .entry((waypoint.x, waypoint.y))
@@ -133,6 +140,7 @@ impl ControlWindow for WorldExplorerData {
                                         .shape(MarkerShape::Diamond);
                                     plot_ui.points(points);
                                 }
+                                waypoint_record.clear();
                             }
                         }
                     }
