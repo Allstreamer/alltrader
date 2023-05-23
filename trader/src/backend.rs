@@ -5,13 +5,13 @@ use spacedust::{
         agents_api::get_my_agent,
         configuration::Configuration,
         contracts_api::get_contracts,
-        default_api::register,
+        default_api::{get_status, register},
         fleet_api::{get_my_ships, refuel_ship},
     },
     models::{
         register_request::Faction, register_request::RegisterRequest, GetContracts200Response,
-        GetMyAgent200Response, GetMyShips200Response, RefuelShip200Response, Register201Response,
-        Ship,
+        GetMyAgent200Response, GetMyShips200Response, GetStatus200Response, RefuelShip200Response,
+        Register201Response, Ship,
     },
 };
 use std::{collections::VecDeque, sync::Arc};
@@ -45,6 +45,7 @@ pub enum Command {
     Refuel {
         ship: Ship,
     },
+    GetStatus,
     Quit,
 }
 use crate::config::get_config_key;
@@ -63,6 +64,7 @@ pub struct CommandData {
     pub contract_data: Option<(GetContracts200Response, ResponseID)>,
     pub universe_data: Option<(Vec<System>, ResponseID)>,
     pub refuel_data: Option<(RefuelShip200Response, ResponseID)>,
+    pub status_data: Option<(GetStatus200Response, ResponseID)>,
 }
 
 pub fn run_backend(
@@ -132,6 +134,10 @@ pub fn run_backend(
                     Command::Refuel { ship } => {
                         response_data_lock.refuel_data =
                             UnwrapReq!(refuel_ship(&config, &ship.symbol, 0).await, latest_cmd.1);
+                    }
+                    Command::GetStatus => {
+                        response_data_lock.status_data =
+                            UnwrapReq!(get_status(&config).await, latest_cmd.1);
                     }
                 }
                 drop(response_data_lock);
