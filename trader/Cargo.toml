@@ -8,7 +8,7 @@ color-eyre = "0.6"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tokio = {version = "1", features = ["full"]}
-spacedust = "1.0.7"
+spacedust = "1.0.9"
 eframe = {version = "0.21", features = ["persistence"]}
 egui = "0.21"
 serde = {version = "1", features = ["derive"]}

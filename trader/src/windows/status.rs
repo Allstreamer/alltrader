@@ -143,9 +143,10 @@ impl ControlWindow for StatusData {
                                 ui.collapsing("announcements", |ui| {
                                     let mut announcements = status.announcements.clone();
                                     for (_i, announcement) in announcements.iter_mut().enumerate() {
-                                        ui.label(&announcement.title);
-                                        ui.label(&announcement.body.to_string());
-                                        ui.end_row();
+                                        ui.collapsing(&announcement.title, |ui| {
+                                            ui.label(&announcement.body.to_string());
+                                            ui.end_row();
+                                        });
                                     }
                                 })
                             });
