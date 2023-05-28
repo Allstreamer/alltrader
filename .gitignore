@@ -4,3 +4,4 @@ openapitools.json
 /config/config.ini
 /config/systems.json
 Cargo.lock
+.vscode
