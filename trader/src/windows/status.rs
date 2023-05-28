@@ -3,7 +3,7 @@ use crate::backend::push_command;
 use crate::backend::Command;
 use crate::backend::CommandRequest;
 use crate::utils::ContinueLock;
-
+use regex::Regex;
 #[derive(Debug, Default)]
 pub struct StatusData {
     visible: bool,
@@ -144,7 +144,13 @@ impl ControlWindow for StatusData {
                                     let mut announcements = status.announcements.clone();
                                     for (_i, announcement) in announcements.iter_mut().enumerate() {
                                         ui.collapsing(&announcement.title, |ui| {
-                                            ui.label(&announcement.body.to_string());
+                                            let segments = extract_segments(&announcement.body);
+                                            for segment in &segments {
+                                                match segment {
+                                                    Segment::String(string) => ui.label(string),
+                                                    Segment::Url(url) => ui.hyperlink_to(url, url),
+                                                };
+                                            }
                                             ui.end_row();
                                         });
                                     }
@@ -191,4 +197,39 @@ impl ControlWindow for StatusData {
     fn visibility(&mut self) -> &mut bool {
         &mut self.visible
     }
+}
+
+#[derive(Debug)]
+enum Segment {
+    String(String),
+    Url(String),
+}
+
+fn extract_segments(text: &str) -> Vec<Segment> {
+    let re = Regex::new(r"\b(https?://\S+)\b").unwrap();
+
+    let mut results: Vec<Segment> = Vec::new();
+
+    let mut last_index = 0;
+    for capture in re.captures_iter(text) {
+        let url_start = capture.get(0).unwrap().start();
+        let url_end = capture.get(0).unwrap().end();
+
+        if last_index != url_start {
+            let string = &text[last_index..url_start];
+            results.push(Segment::String(string.to_string()));
+        }
+
+        let url = &text[url_start..url_end];
+        results.push(Segment::Url(url.to_string()));
+
+        last_index = url_end;
+    }
+
+    if last_index < text.len() {
+        let string = &text[last_index..];
+        results.push(Segment::String(string.to_string()));
+    }
+
+    results
 }

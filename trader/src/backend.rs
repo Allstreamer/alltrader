@@ -73,6 +73,7 @@ pub fn run_backend(
 ) -> Result<()> {
     let _ = std::thread::spawn(move || {
         let mut config = Configuration::new();
+        // config.base_path = "http://localhost:3000".to_string(); for debugging purposes
         let rt = Runtime::new().unwrap();
         rt.block_on(async {
             loop {

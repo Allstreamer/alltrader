@@ -2998,6 +2998,7 @@ dependencies = [
  "eframe",
  "egui",
  "image",
+ "regex",
  "reqwest",
  "rust-ini",
  "serde",
