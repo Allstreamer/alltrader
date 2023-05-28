@@ -7,7 +7,7 @@ use crate::{
     utils::ContinueLock,
     windows::{
         agent::AgentData, auth::AuthMenuData, contract_info::ContractInfoData,
-        contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData,
+        contracts::ContractsData, ship_info::ShipInfoData, ships::ShipMenuData, status::StatusData,
         world_explorer::WorldExplorerData,
     },
 };
@@ -76,6 +76,7 @@ impl TradingGUI {
                 Box::<ContractsData>::default(),
                 Box::<ContractInfoData>::default(),
                 Box::<WorldExplorerData>::default(),
+                Box::<StatusData>::default(),
             ])),
             msg_queue,
             response_data,
